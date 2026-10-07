@@ -1,0 +1,2889 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Космический Банан: Galactic Banana Clicker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            rarityCommon: '#94A3B8',
+            rarityRare: '#38BDF8',
+            rarityEpic: '#C084FC',
+            rarityLegendary: '#FBBF24',
+            rarityMythic: '#F43F5E'
+          },
+          animation: {
+            'bounce-click': 'bananaPop 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            'float-slow': 'floatBanana 4s ease-in-out infinite',
+            'spin-slow': 'spin 18s linear infinite',
+            'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow-pulse': 'glowPulse 2s infinite alternate'
+          },
+          keyframes: {
+            bananaPop: {
+              '0%': { transform: 'scale(1)' },
+              '45%': { transform: 'scale(0.88) rotate(-4deg)' },
+              '100%': { transform: 'scale(1) rotate(0deg)' }
+            },
+            floatBanana: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+              '50%': { transform: 'translateY(-10px) rotate(2deg)' }
+            },
+            glowPulse: {
+              '0%': { filter: 'drop-shadow(0 0 15px rgba(251, 191, 36, 0.25))' },
+              '100%': { filter: 'drop-shadow(0 0 35px rgba(251, 191, 36, 0.65))' }
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
+    
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Custom scrollbar for mouse wheel convenience */
+    .custom-scroll::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(245, 158, 11, 0.4);
+      border-radius: 8px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(245, 158, 11, 0.7);
+    }
+
+    /* Floating numbers on click */
+    .floating-banana-text {
+      position: fixed;
+      pointer-events: none;
+      font-weight: 800;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      animation: floatUpFade 0.85s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+    }
+
+    @keyframes floatUpFade {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -20%) scale(0.9);
+      }
+      50% {
+        transform: translate(-50%, -70%) scale(1.15);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -120%) scale(1.0);
+      }
+    }
+
+    /* Glassmorphism containers */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card-hover {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-2px);
+      border-color: rgba(245, 158, 11, 0.4);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(245, 158, 11, 0.15);
+    }
+
+    /* Theme Overrides */
+    body.theme-cyber {
+      background: radial-gradient(circle at 50% 20%, #1e113a 0%, #0a0614 100%) !important;
+    }
+    body.theme-gold {
+      background: radial-gradient(circle at 50% 20%, #2a210d 0%, #0d0a04 100%) !important;
+    }
+    body.theme-matrix {
+      background: radial-gradient(circle at 50% 20%, #062615 0%, #020d07 100%) !important;
+    }
+    body.theme-synth {
+      background: radial-gradient(circle at 50% 20%, #341238 0%, #0c0412 100%) !important;
+    }
+  </style>
+</head>
+<body id="appBody" class="bg-slate-950 text-slate-100 min-h-screen h-[100dvh] flex flex-col overflow-hidden selection:bg-amber-500 selection:text-slate-950">
+
+  <!-- TOP STATUS BAR -->
+  <header class="glass-card border-b border-slate-800/80 px-3 sm:px-6 py-2.5 flex items-center justify-between shrink-0 z-30 shadow-md">
+    <!-- Brand & Level Info -->
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-xl shadow-lg shadow-amber-500/25 cursor-pointer transform hover:rotate-12 transition" onclick="switchTab('clicker')">
+        🍌
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs sm:text-sm font-extrabold tracking-wide text-amber-400">GALACTIC BANANA</span>
+          <span class="text-[10px] bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono px-1.5 py-0.5 rounded-full font-bold">v5.0 PRO</span>
+        </div>
+        <div class="text-[11px] text-slate-400 flex items-center gap-2">
+          <span>Скины: <b id="headerSkinCount" class="text-slate-200">1/42</b></span>
+          <span class="hidden sm:inline">•</span>
+          <span class="hidden sm:inline">Гарант Эпик: <b id="headerPityEpic" class="text-purple-400">0/25</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Controls: Settings, Sound, Stats, Prestige -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <div class="hidden md:flex flex-col text-right pr-2 border-r border-slate-800">
+        <span class="text-[10px] text-slate-400 uppercase font-semibold">Бонус Престижа</span>
+        <span id="topPrestigeMultiplier" class="text-xs font-mono font-bold text-emerald-400">+0%</span>
+      </div>
+
+      <button onclick="openSettingsModal()" class="p-2 sm:px-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-200 text-sm transition active:scale-95 shadow flex items-center gap-1" title="Настройки и палитры">
+        ⚙️ <span class="hidden sm:inline text-xs font-semibold">Опции</span>
+      </button>
+
+      <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-200 text-sm transition active:scale-95 shadow" title="Включить/Выключить звук">
+        🔊
+      </button>
+    </div>
+  </header>
+
+  <nav class="bg-slate-900/85 border-b border-slate-800/80 px-2 sm:px-6 flex items-center justify-between shrink-0 z-20 overflow-x-auto custom-scroll">
+    <div class="flex items-center gap-1 sm:gap-2 w-full max-w-4xl mx-auto">
+      <button onclick="switchTab('clicker')" id="navBtn-clicker" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-amber-400 text-amber-300 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+        <span>🍌</span> <span>Кликер</span>
+      </button>
+
+      <button onclick="switchTab('inventory')" id="navBtn-inventory" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+        <span>🎒</span> <span>Инвентарь</span>
+        <span id="navInventoryCount" class="text-[10px] bg-slate-800 text-amber-300 px-1.5 py-0.5 rounded-full font-mono font-bold">1/42</span>
+      </button>
+
+      <button onclick="switchTab('cases')" id="navBtn-cases" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+        <span>📦</span> <span>Кейсы (14)</span>
+      </button>
+
+      <button onclick="switchTab('buildings')" id="navBtn-buildings" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+        <span>🏭</span> <span>Фабрики (12)</span>
+      </button>
+
+      <button onclick="switchTab('prestige')" id="navBtn-prestige" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+        <span>👑</span> <span>Престиж</span>
+      </button>
+
+      <button onclick="switchTab('secret')" id="navBtn-secret" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+        <span id="navSecretIcon">🔒</span> <span id="navSecretLabel">Секретно</span>
+      </button>
+    </div>
+  </nav>
+
+  <main id="mainContainer" class="flex-1 overflow-y-auto custom-scroll relative p-3 sm:p-6 flex flex-col items-center">
+
+    <!-- FRENZY FLOATING BANNER (ACTIVE ON GOLDEN BANANA TAP) -->
+    <div id="frenzyBanner" class="hidden w-full max-w-xl mb-4 bg-gradient-to-r from-amber-600 via-red-600 to-amber-600 p-3 rounded-2xl shadow-xl shadow-amber-500/20 text-center animate-pulse border border-amber-300/40">
+      <div class="text-xs sm:text-sm font-black uppercase tracking-widest text-yellow-200 flex items-center justify-center gap-2">
+        🔥 БАНАНОВОЕ БЕЗУМИЕ (x7 К ВЫРАБОТКЕ) 🔥
+      </div>
+      <div id="frenzyTimerText" class="text-[11px] font-mono text-white/90 mt-0.5">Осталось: 15.0с</div>
+    </div>
+
+    <!-- ==================== TAB 1: CLICKER ==================== -->
+    <div id="view-clicker" class="w-full max-w-2xl flex flex-col items-center justify-between gap-4 py-2 my-auto">
+      
+      <!-- Stats Dashboard -->
+      <div class="w-full grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="glass-card rounded-2xl p-3 text-center border-amber-500/20 shadow">
+          <div class="text-[10px] text-slate-400 uppercase font-semibold">Бананы на счету</div>
+          <div id="totalBananasText" class="text-base sm:text-xl font-mono font-black text-amber-300 truncate">0</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-3 text-center border-slate-700/50 shadow">
+          <div class="text-[10px] text-slate-400 uppercase font-semibold">Доход в сек (CPS)</div>
+          <div id="cpsText" class="text-base sm:text-xl font-mono font-black text-emerald-400 truncate">0.0</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-3 text-center border-slate-700/50 shadow">
+          <div class="text-[10px] text-slate-400 uppercase font-semibold">Сила клика (CPC)</div>
+          <div id="cpcText" class="text-base sm:text-xl font-mono font-black text-sky-400 truncate">1</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-3 text-center border-slate-700/50 shadow">
+          <div class="text-[10px] text-slate-400 uppercase font-semibold">Шанс крита</div>
+          <div id="critChanceText" class="text-base sm:text-xl font-mono font-black text-pink-400 truncate">5%</div>
+        </div>
+      </div>
+
+      <div class="relative py-4 sm:py-6 flex flex-col items-center justify-center">
+        <!-- Glow Aura behind Banana -->
+        <div id="bananaGlowAura" class="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-amber-500/15 blur-3xl -z-10 pointer-events-none transition-all duration-300"></div>
+
+        <!-- Banana SVG wrapper with interactive listeners -->
+        <div id="bananaClickTarget" class="cursor-pointer transition-transform duration-75 select-none relative group touch-manipulation active:scale-90" onclick="tapBanana(event)">
+          <div id="bananaSvgContainer" class="w-60 h-60 sm:w-80 sm:h-80 drop-shadow-2xl transition-all duration-300">
+            <!-- Dynamic SVG injected here -->
+          </div>
+        </div>
+
+        <!-- Current Skin Name & Buff -->
+        <div class="mt-3 text-center">
+          <div class="flex items-center justify-center gap-2">
+            <span id="equippedSkinName" class="text-base sm:text-lg font-black text-amber-300 drop-shadow">Классический Банан</span>
+            <span id="equippedSkinBadge" class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-mono">Common</span>
+          </div>
+          <p id="equippedSkinBuff" class="text-xs text-slate-400 mt-0.5">Базовый скин (Без бонусов)</p>
+        </div>
+      </div>
+
+      <div class="w-full glass-card rounded-2xl p-3.5 border-slate-800 shadow">
+        <div class="flex items-center justify-between text-xs mb-1.5">
+          <span class="font-semibold text-slate-300 flex items-center gap-1.5">
+            <span>🎁</span> <span>Бесплатный Дроп Скина</span>
+          </span>
+          <span id="freeDropCountText" class="font-mono text-amber-300 font-bold">0 / 750 кликов</span>
+        </div>
+        <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
+          <div id="freeDropFill" class="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-emerald-400 rounded-full transition-all duration-200" style="width: 0%"></div>
+        </div>
+        <div class="mt-2.5 flex justify-end">
+          <button id="freeDropBtn" onclick="claimFreeDrop()" disabled class="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-800 text-slate-500 cursor-not-allowed transition flex items-center justify-center gap-1.5 shadow">
+            <span>Забрать Дроп</span> <span>🎁</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 2: INVENTORY ==================== -->
+    <div id="view-inventory" class="w-full max-w-4xl hidden flex-col gap-4 py-2">
+      <!-- Inventory Header Controls -->
+      <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow">
+        <div>
+          <h2 class="text-lg font-black text-amber-300">Ваша Коллекция Бананов</h2>
+          <p class="text-xs text-slate-400">Надевайте скины для активации баффов или продавайте повторные дубликаты.</p>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button onclick="sellAllDuplicates()" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95">
+            <span>💰</span> <span>Продать все дубликаты</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scroll">
+        <button onclick="filterInventory('all')" class="inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition shadow" data-filter="all">Все (42)</button>
+        <button onclick="filterInventory('Common')" class="inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition" data-filter="Common">Common</button>
+        <button onclick="filterInventory('Rare')" class="inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition" data-filter="Rare">Rare</button>
+        <button onclick="filterInventory('Epic')" class="inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition" data-filter="Epic">Epic</button>
+        <button onclick="filterInventory('Legendary')" class="inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition" data-filter="Legendary">Legendary</button>
+        <button onclick="filterInventory('Mythic')" class="inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition" data-filter="Mythic">Mythic</button>
+      </div>
+
+      <!-- Skins Grid Container -->
+      <div id="inventoryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 pb-8">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- ==================== TAB 3: CASES ==================== -->
+    <div id="view-cases" class="w-full max-w-4xl hidden flex-col gap-4 py-2">
+      <!-- Pity banner -->
+      <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-amber-500/20 shadow">
+        <div>
+          <div class="text-sm font-black text-amber-300 flex items-center gap-1.5">
+            <span>🎯</span> <span>Гарант Дропа (Pity System)</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">В каждом открытом кейсе работает счетчик гарантированного выпадения ценных скинов.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-slate-900/90 border border-purple-500/30 rounded-xl px-3 py-1.5 text-center">
+            <span class="text-[10px] text-purple-300 uppercase block font-semibold">Гарант Эпик</span>
+            <span id="pityEpicText" class="text-xs font-mono font-bold text-purple-400">0 / 25</span>
+          </div>
+          <div class="bg-slate-900/90 border border-amber-500/30 rounded-xl px-3 py-1.5 text-center">
+            <span class="text-[10px] text-amber-300 uppercase block font-semibold">Гарант Легендарный</span>
+            <span id="pityLegendaryText" class="text-xs font-mono font-bold text-amber-400">0 / 75</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cases Grid -->
+      <div id="casesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pb-8">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- ==================== TAB 4: BUILDINGS ==================== -->
+    <div id="view-buildings" class="w-full max-w-3xl hidden flex-col gap-4 py-2">
+      <!-- Buildings Multiplier Row -->
+      <div class="glass-card rounded-2xl p-3 flex items-center justify-between gap-3 shadow">
+        <span class="text-xs font-bold text-slate-300">Режим покупки фабрик:</span>
+        <div class="flex items-center gap-1.5">
+          <button onclick="setBuyMultiplier(1)" class="buy-mult-btn px-3 py-1 rounded-xl text-xs font-mono font-bold bg-amber-500 text-slate-950 shadow" data-mult="1">1x</button>
+          <button onclick="setBuyMultiplier(10)" class="buy-mult-btn px-3 py-1 rounded-xl text-xs font-mono font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-mult="10">10x</button>
+          <button onclick="setBuyMultiplier(100)" class="buy-mult-btn px-3 py-1 rounded-xl text-xs font-mono font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-mult="100">100x</button>
+        </div>
+      </div>
+
+      <!-- Buildings List -->
+      <div id="buildingsList" class="flex flex-col gap-2.5 pb-8">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- ==================== TAB 5: PRESTIGE ==================== -->
+    <div id="view-prestige" class="w-full max-w-2xl hidden flex-col gap-5 py-4">
+      <div class="glass-card rounded-2xl p-6 border border-amber-500/25 text-center shadow-xl">
+        <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-amber-600 to-yellow-400 flex items-center justify-center text-3xl shadow-lg shadow-amber-500/20 mb-3">
+          👑
+        </div>
+        <h2 class="text-xl font-extrabold text-amber-300">Космическая Реинкарнация</h2>
+        <p class="text-xs text-slate-300 mt-2 leading-relaxed max-w-md mx-auto">
+          Сбросьте все накопленные бананы и фабрики в обмен на <strong class="text-amber-400">Золотые Кожурки</strong>.
+          Каждая кожурка даёт постоянный множитель <span class="text-emerald-400 font-bold">+20%</span> ко всей выработке навсегда!
+        </p>
+
+        <div class="mt-6 bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-2 text-xs font-mono">
+          <div class="flex justify-between text-slate-400">
+            <span>Текущие Кожурки:</span>
+            <span id="prestigePeelsCurrent" class="text-amber-300 font-bold">0 шт. (+0%)</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Будет получено при сбросе:</span>
+            <span id="prestigePeelsPending" class="text-emerald-400 font-bold">+0 шт. (+0%)</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Всего собрано за историю:</span>
+            <span id="prestigeAllTimeStat" class="text-slate-200 font-bold">0 🍌</span>
+          </div>
+        </div>
+
+        <button id="prestigeExecuteBtn" onclick="executePrestige()" disabled class="mt-6 w-full py-3.5 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed transition">
+          Нужно больше бананов для сброса
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 6: SECRET MARKET ==================== -->
+    <div id="view-secret" class="w-full max-w-3xl hidden flex-col gap-4 py-2">
+      
+      <!-- Locked State Banner (When Ascensions === 0) -->
+      <div id="secretLockedState" class="glass-card rounded-3xl p-8 border border-purple-500/30 text-center shadow-2xl my-auto">
+        <div class="w-20 h-20 mx-auto rounded-3xl bg-purple-950/70 border border-purple-500/40 flex items-center justify-center text-4xl shadow-lg shadow-purple-500/20 mb-4 animate-pulse">
+          🔒
+        </div>
+        <h2 class="text-xl font-black text-purple-300">Тайный Рынок Заблокирован</h2>
+        <p class="text-xs text-slate-300 mt-2 max-w-md mx-auto leading-relaxed">
+          Продавцы чёрного рынка галактики ведут дела только с теми, кто познал истинное перерождение.
+        </p>
+        <div class="mt-5 inline-flex items-center gap-2 bg-slate-900/90 border border-purple-500/30 px-4 py-2 rounded-2xl text-xs font-mono text-purple-300">
+          <span>Требование:</span>
+          <span class="font-bold text-amber-300">Совершить 1 Престиж (Реинкарнацию)</span>
+        </div>
+        <div class="mt-6">
+          <button onclick="switchTab('prestige')" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs uppercase tracking-wider transition active:scale-95 shadow-lg shadow-purple-500/20">
+            Перейти к Престижу →
+          </button>
+        </div>
+      </div>
+
+      <!-- Unlocked State View -->
+      <div id="secretUnlockedState" class="hidden flex-col gap-4">
+        <!-- Market Header -->
+        <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border border-purple-500/30 shadow-lg">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🗝️</span>
+              <h2 class="text-lg font-black text-purple-300">Тайный Космический Рынок</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Постоянные артефакты и усиления за Золотые Кожурки.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-slate-900/95 border border-amber-500/30 rounded-2xl px-4 py-2 shrink-0">
+            <span class="text-xs text-slate-400 uppercase font-semibold">Баланс Кожурок:</span>
+            <span id="secretPeelsBalance" class="text-sm font-mono font-black text-amber-300">0 🍌✨</span>
+          </div>
+        </div>
+
+        <!-- Upgrades List -->
+        <div id="secretUpgradesList" class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-8">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- CASE DROP ROULETTE MODAL (CS:GO STYLE HORIZONTAL ROLLER) -->
+  <div id="rouletteModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-amber-500/40 rounded-3xl max-w-3xl w-full p-6 text-center shadow-2xl relative overflow-hidden">
+      
+      <h3 class="text-lg font-black text-amber-300 uppercase tracking-widest mb-1">ОТКРЫТИЕ КЕЙСА</h3>
+      <p id="rouletteCaseSubtitle" class="text-xs text-slate-400 mb-6">Испытайте удачу в получении редкого банана!</p>
+
+      <!-- Roulette Viewport Container -->
+      <div class="relative w-full h-44 bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-800 shadow-inner my-2">
+        <!-- Center Target Line Indicator -->
+        <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-amber-400 shadow-[0_0_15px_#f59e0b] z-20 pointer-events-none"></div>
+        <div class="absolute top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-amber-400 z-20 pointer-events-none"></div>
+        <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-amber-400 z-20 pointer-events-none"></div>
+
+        <!-- Moving Strip Track -->
+        <div id="rouletteTrack" class="flex items-center h-full absolute left-0 top-0 transition-transform will-change-transform">
+          <!-- 45 Skin Cards dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Winner Reveal Box (Shown after stop) -->
+      <div id="rouletteWinnerCard" class="hidden flex-col items-center mt-5 p-4 rounded-2xl bg-slate-950/90 border border-amber-500/30 animate-bounce-click">
+        <div class="text-xs uppercase font-extrabold text-amber-400 tracking-wider mb-2">ВАШ ВЫИГРЫШ:</div>
+        <div id="rouletteWinSvg" class="w-24 h-24 my-1"></div>
+        <div id="rouletteWinName" class="text-lg font-extrabold text-white mt-1">Название Скина</div>
+        <div id="rouletteWinRarity" class="text-xs uppercase font-mono font-bold text-amber-300 mb-1">MYTHIC</div>
+        <div id="rouletteWinBuff" class="text-xs text-slate-400 max-w-sm">+250% ко всем показателям</div>
+
+        <div class="flex gap-2 w-full max-w-xs mt-4">
+          <button onclick="equipWonSkin()" class="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow active:scale-95">
+            Экипировать!
+          </button>
+          <button onclick="closeRouletteModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition active:scale-95">
+            В Инвентарь
+          </button>
+        </div>
+      </div>
+
+      <!-- Close button when spinning is done -->
+      <button id="rouletteCloseBtn" onclick="closeRouletteModal()" class="hidden mt-4 text-xs font-bold text-slate-400 hover:text-slate-200 py-2 px-4 rounded-xl">
+        Закрыть
+      </button>
+
+    </div>
+  </div>
+
+  <!-- CASE DETAILS & CHANCES MODAL -->
+  <div id="caseInfoModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-5 text-left shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <h3 id="caseInfoTitle" class="text-base font-extrabold text-amber-300">Содержимое Кейса</h3>
+          <p id="caseInfoDesc" class="text-xs text-slate-400 mt-0.5">Шансы и доступные скины</p>
+        </div>
+        <button onclick="closeCaseInfoModal()" class="text-slate-400 hover:text-slate-200 text-lg p-1.5 rounded-lg">✕</button>
+      </div>
+
+      <!-- Probability Rates -->
+      <div class="my-3 p-3 bg-slate-950/70 rounded-xl border border-slate-800/80">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Шансы дропа редкостей:</div>
+        <div id="caseInfoRates" class="grid grid-cols-2 gap-2 text-xs font-mono">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+      <!-- Skins Pool in this Case -->
+      <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Возможные скины:</div>
+      <div id="caseInfoContent" class="max-h-56 overflow-y-auto custom-scroll space-y-1.5 pr-1">
+        <!-- List injected via JS -->
+      </div>
+
+      <button onclick="closeCaseInfoModal()" class="w-full mt-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+        Закрыть
+      </button>
+    </div>
+  </div>
+
+  <!-- UNIVERSAL CONFIRMATION MODAL -->
+  <div id="confirmModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 text-center shadow-2xl">
+      <div class="text-3xl mb-2">⚠️</div>
+      <h3 id="confirmTitle" class="text-base font-extrabold text-amber-300">Подтвердите действие</h3>
+      <p id="confirmMessage" class="text-xs text-slate-300 mt-2 leading-relaxed">Вы уверены?</p>
+      <div class="flex gap-2 mt-5">
+        <button onclick="closeConfirmModal(false)" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">Отмена</button>
+        <button id="confirmOkBtn" class="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-extrabold transition">Да, подтвердить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-5 text-left shadow-2xl max-h-[90vh] overflow-y-auto custom-scroll">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="text-base font-extrabold text-amber-300">Настройки & Персонализация</h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-200 text-lg p-1.5 rounded-lg">✕</button>
+      </div>
+
+      <div class="py-4 space-y-4 text-xs">
+        <!-- Visual Theme Selection -->
+        <div>
+          <label class="block font-bold text-slate-300 mb-1.5">Тема оформления игры:</label>
+          <select id="themeSelect" onchange="changeTheme(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400 font-semibold">
+            <option value="default">Глубокий Космос (Deep Space)</option>
+            <option value="cyber">Киберпанк Неон (Cyber Neon)</option>
+            <option value="gold">Золотая Империя (Royal Gold)</option>
+            <option value="matrix">Матричный Код (Matrix Green)</option>
+            <option value="synth">Синтивейв 80-х (Synthwave)</option>
+          </select>
+        </div>
+
+        <!-- Audio Volume Range -->
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="font-bold text-slate-300">Громкость звуковых эффектов:</label>
+            <span id="volumeValueLabel" class="font-mono text-amber-400 font-bold">100%</span>
+          </div>
+          <input type="range" id="volumeRange" min="0" max="100" value="100" oninput="updateVolume(this.value)" class="w-full accent-amber-500 bg-slate-800 rounded-lg cursor-pointer">
+        </div>
+
+        <!-- Visual Effects Toggles -->
+        <div class="space-y-2 pt-2 border-t border-slate-800">
+          <label class="block font-bold text-slate-300">Визуальные эффекты:</label>
+          <div class="flex items-center justify-between p-2 bg-slate-950/60 rounded-xl">
+            <span class="text-slate-300">Парение банана (Анимация)</span>
+            <input type="checkbox" id="floatingFxToggle" checked onchange="toggleSetting('floatingFx', this.checked)" class="accent-amber-500 w-4 h-4 cursor-pointer">
+          </div>
+          <div class="flex items-center justify-between p-2 bg-slate-950/60 rounded-xl">
+            <span class="text-slate-300">Частицы и цифры клика</span>
+            <input type="checkbox" id="particlesFxToggle" checked onchange="toggleSetting('particlesFx', this.checked)" class="accent-amber-500 w-4 h-4 cursor-pointer">
+          </div>
+          <div class="flex items-center justify-between p-2 bg-slate-950/60 rounded-xl">
+            <span class="text-slate-300">Неоновое свечение банана</span>
+            <input type="checkbox" id="glowFxToggle" checked onchange="toggleSetting('glowFx', this.checked)" class="accent-amber-500 w-4 h-4 cursor-pointer">
+          </div>
+        </div>
+
+        <!-- Export / Import Save Data -->
+        <div class="space-y-2 pt-2 border-t border-slate-800">
+          <label class="block font-bold text-slate-300">Управление сохранением:</label>
+          <div class="flex gap-2">
+            <button onclick="exportSaveCode()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+              💾 Экспорт кода
+            </button>
+            <button onclick="promptImportSave()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+              📥 Импорт кода
+            </button>
+          </div>
+          <button onclick="confirmHardReset()" class="w-full py-2 bg-red-950/50 hover:bg-red-900/60 border border-red-800/60 text-red-300 rounded-xl text-xs font-bold transition">
+            🗑️ Полный сброс прогресса
+          </button>
+        </div>
+      </div>
+
+      <button onclick="closeSettingsModal()" class="w-full mt-2 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+        Готово
+      </button>
+    </div>
+  </div>
+
+  <!-- IMPORT CODE INPUT MODAL -->
+  <div id="saveInputModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 text-left shadow-2xl">
+      <h3 class="text-base font-extrabold text-amber-300 mb-2">Импорт Сохранения</h3>
+      <p class="text-xs text-slate-400 mb-3">Вставьте код сохранения из буфера обмена:</p>
+      <textarea id="importSaveTextarea" rows="4" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-200 font-mono mb-3 focus:outline-none focus:border-amber-400"></textarea>
+      <div class="flex gap-2">
+        <button onclick="closeSaveInputModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Отмена</button>
+        <button onclick="applyImportedSave()" class="flex-1 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-extrabold">Загрузить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS WRAPPER -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script>
+    /* =====================================================================
+       AUDIO SYNTHESIZER (WEB AUDIO API - NO EXTERNAL AUDIO DEPENDENCIES)
+       ===================================================================== */
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    let soundEnabled = true;
+
+    function playTone(freq, type = 'sine', duration = 0.08, gainVal = 0.12) {
+      if (!soundEnabled || state.settings.volume <= 0) return;
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        const masterVol = (state.settings.volume / 100) * gainVal;
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+        gain.gain.setValueAtTime(masterVol, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        // Audio error fallback
+      }
+    }
+
+    function playPopSfx() {
+      const pitch = 380 + Math.random() * 160;
+      playTone(pitch, 'sine', 0.07, 0.15);
+    }
+
+    function playCritSfx() {
+      playTone(850, 'triangle', 0.15, 0.25);
+      setTimeout(() => playTone(1200, 'sine', 0.2, 0.2), 50);
+    }
+
+    function playBuySfx() {
+      playTone(523.25, 'triangle', 0.09, 0.15);
+      setTimeout(() => playTone(659.25, 'triangle', 0.12, 0.15), 60);
+    }
+
+    function playCaseTickSfx() {
+      playTone(450, 'square', 0.02, 0.05);
+    }
+
+    function playWinSfx() {
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+        setTimeout(() => playTone(f, 'sine', 0.25, 0.2), idx * 80);
+      });
+    }
+
+    /* =====================================================================
+       SKINS DATABASE (42 UNIQUE BANANAS ACROSS 5 RARITY TIERS)
+       ===================================================================== */
+    const SKINS = [
+      {
+        id: 'classic',
+        name: 'Классический Банан',
+        rarity: 'Common',
+        colors: { stop1: '#FFE600', stop2: '#FFCC00', stop3: '#E6A800', stroke: '#B8860B', stem: '#556B2F', tip: '#3E2723' },
+        emoji: '🍌',
+        desc: 'Натуральный спелый тропический банан.',
+        buffDesc: 'Базовый банан без модификаторов.',
+        cpcMult: 1.0,
+        cpsMult: 1.0,
+        critChance: 0.05,
+        sellPrice: 15
+      },
+      {
+        id: 'spotted',
+        name: 'Спелый в Крапинку',
+        rarity: 'Common',
+        colors: { stop1: '#FFE066', stop2: '#E5A910', stop3: '#A87900', stroke: '#8A5A00', stem: '#4D5D18', tip: '#2B1704' },
+        emoji: '🍌🤎',
+        desc: 'Очень сладкий с характерными коричневыми точками.',
+        buffDesc: '+10% к силе клика (CPC)',
+        cpcMult: 1.10,
+        cpsMult: 1.0,
+        critChance: 0.06,
+        sellPrice: 35
+      },
+      {
+        id: 'green',
+        name: 'Незрелый Зелёный',
+        rarity: 'Common',
+        colors: { stop1: '#A3E635', stop2: '#65A30D', stop3: '#4D7C0F', stroke: '#365314', stem: '#1E3A1E', tip: '#142914' },
+        emoji: '🌱',
+        desc: 'Плотный зеленый банан, ему нужно ещё созреть.',
+        buffDesc: '+10% к доходу фабрик (CPS)',
+        cpcMult: 1.0,
+        cpsMult: 1.10,
+        critChance: 0.05,
+        sellPrice: 40
+      },
+      {
+        id: 'pixel',
+        name: '8-Bit Ретро',
+        rarity: 'Common',
+        colors: { stop1: '#FACC15', stop2: '#CA8A04', stop3: '#854D0E', stroke: '#000000', stem: '#4D7C0F', tip: '#000000' },
+        emoji: '👾',
+        desc: 'Родом из игровых автоматов 1980-х годов.',
+        buffDesc: '+12% ко всему доходу',
+        cpcMult: 1.12,
+        cpsMult: 1.12,
+        critChance: 0.07,
+        sellPrice: 50
+      },
+      {
+        id: 'chocolate',
+        name: 'В Шоколадной Глазури',
+        rarity: 'Common',
+        colors: { stop1: '#78350F', stop2: '#451A03', stop3: '#291002', stroke: '#1c0b02', stem: '#140701', tip: '#FDE68A' },
+        emoji: '🍫',
+        desc: 'Десерт, облитый бельгийским шоколадом.',
+        buffDesc: '+15% к клику, +2% крит',
+        cpcMult: 1.15,
+        cpsMult: 1.05,
+        critChance: 0.07,
+        sellPrice: 70
+      },
+      {
+        id: 'ice',
+        name: 'Ледяной Кристалл',
+        rarity: 'Rare',
+        colors: { stop1: '#E0F2FE', stop2: '#7DD3FC', stop3: '#0284C7', stroke: '#0369A1', stem: '#38BDF8', tip: '#0C4A6E' },
+        emoji: '❄️',
+        desc: 'Заморожен при абсолютном нуле.',
+        buffDesc: '+25% к пассивному доходу фабрик',
+        cpcMult: 1.1,
+        cpsMult: 1.25,
+        critChance: 0.08,
+        sellPrice: 200
+      },
+      {
+        id: 'retrowave',
+        name: 'Синти-Вейв 84',
+        rarity: 'Rare',
+        colors: { stop1: '#F472B6', stop2: '#C084FC', stop3: '#6366F1', stroke: '#A855F7', stem: '#FB7185', tip: '#312E81' },
+        emoji: '📼',
+        desc: 'Фиолетовый неоновый стиль из Майами 1984.',
+        buffDesc: '+30% к силе клика, +4% крит',
+        cpcMult: 1.30,
+        cpsMult: 1.15,
+        critChance: 0.09,
+        sellPrice: 260
+      },
+      {
+        id: 'steampunk',
+        name: 'Стимпанк Латунь',
+        rarity: 'Rare',
+        colors: { stop1: '#F59E0B', stop2: '#B45309', stop3: '#78350F', stroke: '#451A03', stem: '#92400E', tip: '#1E1B4B' },
+        emoji: '⚙️',
+        desc: 'Собран из шестерёнок и медных трубок.',
+        buffDesc: '+35% к выработке всех фабрик',
+        cpcMult: 1.15,
+        cpsMult: 1.35,
+        critChance: 0.08,
+        sellPrice: 320
+      },
+      {
+        id: 'cyber',
+        name: 'Кибер-Имплант',
+        rarity: 'Rare',
+        colors: { stop1: '#38BDF8', stop2: '#1E293B', stop3: '#0F172A', stroke: '#00F0FF', stem: '#F43F5E', tip: '#0284C7' },
+        emoji: '🦾',
+        desc: 'Оснащен нейросетевым микропроцессором.',
+        buffDesc: '+35% к клику, +5% крит',
+        cpcMult: 1.35,
+        cpsMult: 1.2,
+        critChance: 0.10,
+        sellPrice: 380
+      },
+      {
+        id: 'alchemy',
+        name: 'Алхимический Изумруд',
+        rarity: 'Rare',
+        colors: { stop1: '#6EE7B7', stop2: '#10B981', stop3: '#047857', stroke: '#064E3B', stem: '#34D399', tip: '#022C22' },
+        emoji: '🧪',
+        desc: 'Трансмутирован средневековыми алхимиками.',
+        buffDesc: '+40% ко ВСЕМУ урожаю',
+        cpcMult: 1.40,
+        cpsMult: 1.40,
+        critChance: 0.10,
+        sellPrice: 480
+      },
+      {
+        id: 'magma',
+        name: 'Лавовая Магма',
+        rarity: 'Epic',
+        colors: { stop1: '#FCA5A5', stop2: '#EF4444', stop3: '#991B1B', stroke: '#F59E0B', stem: '#7F1D1D', tip: '#450A0A' },
+        emoji: '🌋',
+        desc: 'Рожден в жерле действующего вулкана.',
+        buffDesc: '+50% к клику, шанс крита 15%',
+        cpcMult: 1.5,
+        cpsMult: 1.25,
+        critChance: 0.15,
+        sellPrice: 1200
+      },
+      {
+        id: 'matrix',
+        name: 'Матричный Код',
+        rarity: 'Epic',
+        colors: { stop1: '#86EFAC', stop2: '#22C55E', stop3: '#052E16', stroke: '#15803D', stem: '#4ADE80', tip: '#022C22' },
+        emoji: '🟢',
+        desc: 'Зелёный поток символов из цифровой симуляции.',
+        buffDesc: '+50% к пассивному доходу фабрик',
+        cpcMult: 1.25,
+        cpsMult: 1.5,
+        critChance: 0.12,
+        sellPrice: 1400
+      },
+      {
+        id: 'radioactive',
+        name: 'Радиоактивный Уран',
+        rarity: 'Epic',
+        colors: { stop1: '#BEF264', stop2: '#84CC16', stop3: '#365314', stroke: '#A3E635', stem: '#EAB308', tip: '#1A2E05' },
+        emoji: '☢️',
+        desc: 'Период полураспада превышает 4 миллиарда лет.',
+        buffDesc: '+55% ко всему доходу!',
+        cpcMult: 1.55,
+        cpsMult: 1.55,
+        critChance: 0.14,
+        sellPrice: 1650
+      },
+      {
+        id: 'plasma',
+        name: 'Плазменный Шторм',
+        rarity: 'Epic',
+        colors: { stop1: '#C084FC', stop2: '#818CF8', stop3: '#38BDF8', stroke: '#6366F1', stem: '#E879F9', tip: '#1E1B4B' },
+        emoji: '⚡🌌',
+        desc: 'Ионизированный газ сверхвысокой температуры.',
+        buffDesc: '+60% к пассивному доходу, +20% крит',
+        cpcMult: 1.4,
+        cpsMult: 1.6,
+        critChance: 0.20,
+        sellPrice: 2200
+      },
+      {
+        id: 'glitch',
+        name: 'Кибер-Глитч',
+        rarity: 'Epic',
+        colors: { stop1: '#F43F5E', stop2: '#10B981', stop3: '#3B82F6', stroke: '#E11D48', stem: '#06B6D4', tip: '#000000' },
+        emoji: '👾⚠️',
+        desc: 'Сбой в ткани цифровой реальности бананов.',
+        buffDesc: '+65% к клику, шанс критического удара 22%',
+        cpcMult: 1.65,
+        cpsMult: 1.35,
+        critChance: 0.22,
+        sellPrice: 2500
+      },
+      {
+        id: 'neon_sunset',
+        name: 'Неоновый Закат',
+        rarity: 'Epic',
+        colors: { stop1: '#FDE047', stop2: '#F97316', stop3: '#9333EA', stroke: '#C026D3', stem: '#FB7185', tip: '#3B0764' },
+        emoji: '🌅',
+        desc: 'Тёплые неоновые сумерки на побережье Калифорнии.',
+        buffDesc: '+70% к выработке всех фабрик',
+        cpcMult: 1.35,
+        cpsMult: 1.70,
+        critChance: 0.18,
+        sellPrice: 3000
+      },
+      {
+        id: 'ruby',
+        name: 'Кровавый Рубин',
+        rarity: 'Epic',
+        colors: { stop1: '#FDA4AF', stop2: '#E11D48', stop3: '#881337', stroke: '#9F1239', stem: '#FB7185', tip: '#4C0519' },
+        emoji: '♦️',
+        desc: 'Кристаллизованный банан из редких алых минералов.',
+        buffDesc: 'Крит наносит x4.0 урона!',
+        cpcMult: 1.5,
+        cpsMult: 1.5,
+        critChance: 0.25,
+        sellPrice: 3500
+      },
+      {
+        id: 'amethyst',
+        name: 'Аметистовая Друза',
+        rarity: 'Epic',
+        colors: { stop1: '#E9D5FF', stop2: '#A855F7', stop3: '#581C87', stroke: '#7E22CE', stem: '#C084FC', tip: '#3B0764' },
+        emoji: '🔮✨',
+        desc: 'Острые фиолетовые кристаллы с кварцевым блеском.',
+        buffDesc: '+75% к пассивному доходу фабрик',
+        cpcMult: 1.4,
+        cpsMult: 1.75,
+        critChance: 0.20,
+        sellPrice: 4000
+      },
+      {
+        id: 'obsidian',
+        name: 'Вулканический Обсидиан',
+        rarity: 'Epic',
+        colors: { stop1: '#71717A', stop2: '#27272A', stop3: '#09090B', stroke: '#DC2626', stem: '#EF4444', tip: '#000000' },
+        emoji: '🖤🔥',
+        desc: 'Твёрдое вулканическое стекло с трещинами магмы.',
+        buffDesc: '+80% к силе каждого клика',
+        cpcMult: 1.8,
+        cpsMult: 1.4,
+        critChance: 0.22,
+        sellPrice: 4600
+      },
+      {
+        id: 'golden',
+        name: 'Золотой 24 Карата',
+        rarity: 'Legendary',
+        colors: { stop1: '#FEF08A', stop2: '#F59E0B', stop3: '#B45309', stroke: '#FBBF24', stem: '#D97706', tip: '#78350F' },
+        emoji: '🪙✨',
+        desc: 'Слиток чистейшего драгоценного металла высшей пробы.',
+        buffDesc: '+100% ко ВСЕМ показателям!',
+        cpcMult: 2.0,
+        cpsMult: 2.0,
+        critChance: 0.25,
+        sellPrice: 8000
+      },
+      {
+        id: 'cosmic_void',
+        name: 'Космическая Бездна',
+        rarity: 'Legendary',
+        colors: { stop1: '#A855F7', stop2: '#4F46E5', stop3: '#0F172A', stroke: '#818CF8', stem: '#C084FC', tip: '#020617' },
+        emoji: '🌌',
+        desc: 'Содержит в себе глубины открытого космоса.',
+        buffDesc: '+110% ко всему доходу',
+        cpcMult: 2.1,
+        cpsMult: 2.1,
+        critChance: 0.28,
+        sellPrice: 9500
+      },
+      {
+        id: 'diamond',
+        name: 'Алмазная Грань',
+        rarity: 'Legendary',
+        colors: { stop1: '#FFFFFF', stop2: '#BAE6FD', stop3: '#38BDF8', stroke: '#7DD3FC', stem: '#E0F2FE', tip: '#0284C7' },
+        emoji: '💎',
+        desc: 'Идеально огранённый сверкающий бриллиант.',
+        buffDesc: '+120% к клику, +30% крит',
+        cpcMult: 2.2,
+        cpsMult: 1.8,
+        critChance: 0.30,
+        sellPrice: 11000
+      },
+      {
+        id: 'rainbow',
+        name: 'Радужная Призма',
+        rarity: 'Legendary',
+        colors: { stop1: '#F472B6', stop2: '#FBBF24', stop3: '#34D399', stroke: '#60A5FA', stem: '#A78BFA', tip: '#F43F5E' },
+        emoji: '🌈',
+        desc: 'Преломляет свет во все цвета радужного спектра.',
+        buffDesc: '+125% ко ВСЕМ показателям',
+        cpcMult: 2.25,
+        cpsMult: 2.25,
+        critChance: 0.30,
+        sellPrice: 12500
+      },
+      {
+        id: 'hologram',
+        name: 'Квантовая Голограмма',
+        rarity: 'Legendary',
+        colors: { stop1: '#67E8F9', stop2: '#A5F3FC', stop3: '#0891B2', stroke: '#22D3EE', stem: '#A855F7', tip: '#0369A1' },
+        emoji: '💿',
+        desc: 'Мерцающая голографическая проекция из будущего.',
+        buffDesc: '+130% к доходу фабрик, +25% крит',
+        cpcMult: 1.9,
+        cpsMult: 2.3,
+        critChance: 0.28,
+        sellPrice: 14000
+      },
+      {
+        id: 'galaxy_spiral',
+        name: 'Галактическая Спираль',
+        rarity: 'Legendary',
+        colors: { stop1: '#DDD6FE', stop2: '#6366F1', stop3: '#1E1B4B', stroke: '#818CF8', stem: '#EC4899', tip: '#0F172A' },
+        emoji: '🌌🌀',
+        desc: 'Миниатюрный рукав галактики с миллиардами звёзд.',
+        buffDesc: '+140% ко всему доходу кликера и фабрик',
+        cpcMult: 2.4,
+        cpsMult: 2.4,
+        critChance: 0.30,
+        sellPrice: 16000
+      },
+      {
+        id: 'solar_flare',
+        name: 'Солнечная Вспышка',
+        rarity: 'Legendary',
+        colors: { stop1: '#FEF08A', stop2: '#F97316', stop3: '#B91C1C', stroke: '#F59E0B', stem: '#EA580C', tip: '#7F1D1D' },
+        emoji: '☀️💥',
+        desc: 'Корональный выброс массы в форме плода банана.',
+        buffDesc: '+160% к силе клика, +30% крит',
+        cpcMult: 2.6,
+        cpsMult: 1.9,
+        critChance: 0.30,
+        sellPrice: 18000
+      },
+      {
+        id: 'aurora',
+        name: 'Северное Сияние',
+        rarity: 'Legendary',
+        colors: { stop1: '#A7F3D0', stop2: '#2DD4BF', stop3: '#0E7490', stroke: '#059669', stem: '#38BDF8', tip: '#042F2E' },
+        emoji: '🌌💚',
+        desc: 'Полярные сполохи ионизированного кислорода в небесах.',
+        buffDesc: '+170% к выработке всех автоматических построек',
+        cpcMult: 1.9,
+        cpsMult: 2.7,
+        critChance: 0.28,
+        sellPrice: 21000
+      },
+      {
+        id: 'superconductor',
+        name: 'Сверхпроводник LK-99',
+        rarity: 'Legendary',
+        colors: { stop1: '#CFFAFE', stop2: '#06B6D4', stop3: '#164E63', stroke: '#22D3EE', stem: '#67E8F9', tip: '#083344' },
+        emoji: '🧲⚡',
+        desc: 'Нулевое сопротивление бананового электричества.',
+        buffDesc: '+180% ко всему доходу',
+        cpcMult: 2.8,
+        cpsMult: 2.8,
+        critChance: 0.32,
+        sellPrice: 24000
+      },
+      {
+        id: 'cyber_samurai',
+        name: 'Кибер-Самурай',
+        rarity: 'Legendary',
+        colors: { stop1: '#FECDD3', stop2: '#F43F5E', stop3: '#4C0519', stroke: '#FFE4E6', stem: '#E11D48', tip: '#09090B' },
+        emoji: '⚔️🦾',
+        desc: 'Закален в неоновом масле, острый как мономолекулярная нить.',
+        buffDesc: '+200% к силе клика, крит наносит x5 урона!',
+        cpcMult: 3.0,
+        cpsMult: 2.0,
+        critChance: 0.35,
+        sellPrice: 28000
+      },
+      {
+        id: 'neutron_star',
+        name: 'Нейтронная Звезда',
+        rarity: 'Legendary',
+        colors: { stop1: '#FFFFFF', stop2: '#93C5FD', stop3: '#1D4ED8', stroke: '#BFDBFE', stem: '#60A5FA', tip: '#1E3A8A' },
+        emoji: '💫⭐',
+        desc: 'Один кубический сантиметр весит больше триллиона тонн.',
+        buffDesc: '+220% к пассивному доходу фабрик',
+        cpcMult: 2.2,
+        cpsMult: 3.2,
+        critChance: 0.30,
+        sellPrice: 32000
+      },
+      {
+        id: 'chrono_time',
+        name: 'Хроно-Сдвиг',
+        rarity: 'Legendary',
+        colors: { stop1: '#FDE68A', stop2: '#F59E0B', stop3: '#78350F', stroke: '#38BDF8', stem: '#60A5FA', tip: '#451A03' },
+        emoji: '⏳🌀',
+        desc: 'Искривляет стрелки часов, ускоряя производство.',
+        buffDesc: '+240% ко ВСЕМУ урожаю',
+        cpcMult: 3.4,
+        cpsMult: 3.4,
+        critChance: 0.33,
+        sellPrice: 36000
+      },
+      {
+        id: 'anti_matter',
+        name: 'Банан Антиматерии',
+        rarity: 'Legendary',
+        colors: { stop1: '#E2E8F0', stop2: '#64748B', stop3: '#0F172A', stroke: '#F43F5E', stem: '#38BDF8', tip: '#020617' },
+        emoji: '⚛️🖤',
+        desc: 'Аннигилирует при контакте с обычной кожурой.',
+        buffDesc: '+260% к клику, +35% шанс крита',
+        cpcMult: 3.6,
+        cpsMult: 2.8,
+        critChance: 0.35,
+        sellPrice: 40000
+      },
+      {
+        id: 'quantum_cat',
+        name: 'Квантовый Шрёдингер',
+        rarity: 'Legendary',
+        colors: { stop1: '#FED7AA', stop2: '#FB923C', stop3: '#7C2D12', stroke: '#A855F7', stem: '#C084FC', tip: '#18181B' },
+        emoji: '🐱📦',
+        desc: 'Одновременно и съеден, и созревает на ветке.',
+        buffDesc: '+280% ко всей выработке империи',
+        cpcMult: 3.8,
+        cpsMult: 3.8,
+        critChance: 0.36,
+        sellPrice: 45000
+      },
+      {
+        id: 'blackhole',
+        name: 'Чёрная Дыра',
+        rarity: 'Mythic',
+        colors: { stop1: '#E2E8F0', stop2: '#475569', stop3: '#000000', stroke: '#94A3B8', stem: '#F43F5E', tip: '#000000' },
+        emoji: '🕳️⭐',
+        desc: 'Гравитационная сингулярность, засасывающая клики.',
+        buffDesc: '+300% ко ВСЕМ показателям!',
+        cpcMult: 4.0,
+        cpsMult: 4.0,
+        critChance: 0.40,
+        sellPrice: 60000
+      },
+      {
+        id: 'divine_god',
+        name: 'Божественный Банан',
+        rarity: 'Mythic',
+        colors: { stop1: '#FFF176', stop2: '#FF8A80', stop3: '#80D8FF', stroke: '#FFD700', stem: '#69F0AE', tip: '#EA80FC' },
+        emoji: '🌟',
+        desc: 'Создатель всей вселенной бананов и печенек.',
+        buffDesc: '+350% ко ВСЕМ показателям!',
+        cpcMult: 4.5,
+        cpsMult: 4.5,
+        critChance: 0.45,
+        sellPrice: 80000
+      },
+      {
+        id: 'dark_energy',
+        name: 'Тёмная Энергия',
+        rarity: 'Mythic',
+        colors: { stop1: '#A855F7', stop2: '#4C1D95', stop3: '#0F051D', stroke: '#C084FC', stem: '#F43F5E', tip: '#000000' },
+        emoji: '🌌🔮',
+        desc: 'Таинственная сила, заставляющая вселенную бананов расширяться.',
+        buffDesc: '+400% ко ВСЕМУ доходу!',
+        cpcMult: 5.0,
+        cpsMult: 5.0,
+        critChance: 0.45,
+        sellPrice: 100000
+      },
+      {
+        id: 'supernova',
+        name: 'Взрыв Сверхновой',
+        rarity: 'Mythic',
+        colors: { stop1: '#FEF08A', stop2: '#F43F5E', stop3: '#6D28D9', stroke: '#FBBF24', stem: '#38BDF8', tip: '#312E81' },
+        emoji: '💥✨',
+        desc: 'Финальный аккорд гигантской звезды перед коллапсом.',
+        buffDesc: '+450% к клику и фабрикам, крит x6!',
+        cpcMult: 5.5,
+        cpsMult: 5.5,
+        critChance: 0.48,
+        sellPrice: 130000
+      },
+      {
+        id: 'multiverse',
+        name: 'Мультивселенский Спектр',
+        rarity: 'Mythic',
+        colors: { stop1: '#6EE7B7', stop2: '#3B82F6', stop3: '#EC4899', stroke: '#FACC15', stem: '#8B5CF6', tip: '#1E1B4B' },
+        emoji: '🪐🌈',
+        desc: 'Содержит версии банана из параллельных измерений.',
+        buffDesc: '+500% ко ВСЕМ показателям!',
+        cpcMult: 6.0,
+        cpsMult: 6.0,
+        critChance: 0.50,
+        sellPrice: 170000
+      },
+      {
+        id: 'dimension_rift',
+        name: 'Разлом Измерений',
+        rarity: 'Mythic',
+        colors: { stop1: '#F472B6', stop2: '#06B6D4', stop3: '#1E1B4B', stroke: '#E11D48', stem: '#22C55E', tip: '#020617' },
+        emoji: '🌀🕳️',
+        desc: 'Прорыв сквозь пространство прямо в первородный банановый бульон.',
+        buffDesc: '+550% ко ВСЕМ показателям, +50% крит',
+        cpcMult: 6.5,
+        cpsMult: 6.5,
+        critChance: 0.50,
+        sellPrice: 220000
+      },
+      {
+        id: 'infinity_stone',
+        name: 'Банан Бесконечности',
+        rarity: 'Mythic',
+        colors: { stop1: '#FDE047', stop2: '#A855F7', stop3: '#EF4444', stroke: '#3B82F6', stem: '#10B981', tip: '#F97316' },
+        emoji: '💎👑',
+        desc: 'Один щелчок пальцев очищает половину бананов во вселенной.',
+        buffDesc: '+600% ко ВСЕМУ доходу!',
+        cpcMult: 7.0,
+        cpsMult: 7.0,
+        critChance: 0.52,
+        sellPrice: 300000
+      },
+      {
+        id: 'omega_titan',
+        name: 'Омега-Титан',
+        rarity: 'Mythic',
+        colors: { stop1: '#E2E8F0', stop2: '#D97706', stop3: '#451A03', stroke: '#F59E0B', stem: '#EF4444', tip: '#18181B' },
+        emoji: '🗿⚡',
+        desc: 'Древний космический колосс эпохи зарождения галактик.',
+        buffDesc: '+700% ко ВСЕМ показателям игры!',
+        cpcMult: 8.0,
+        cpsMult: 8.0,
+        critChance: 0.55,
+        sellPrice: 420000
+      },
+      {
+        id: 'creator_genesis',
+        name: 'Первородный Генезис',
+        rarity: 'Mythic',
+        colors: { stop1: '#FFFFFF', stop2: '#FBBF24', stop3: '#E11D48', stroke: '#67E8F9', stem: '#A855F7', tip: '#F43F5E' },
+        emoji: '🌌👑✨',
+        desc: 'Абсолютная сингулярность. Начало и конец всего бананового бытия.',
+        buffDesc: '+900% ко ВСЕМУ доходу навсегда!',
+        cpcMult: 10.0,
+        cpsMult: 10.0,
+        critChance: 0.60,
+        sellPrice: 650000
+      }
+    ];
+
+    /* =====================================================================
+       CASES CATALOG (14 BALANCED CASES FOR ALL GAME STAGES)
+       ===================================================================== */
+    const CASES = [
+      {
+        id: 'case_harvest',
+        name: 'Земной Сбор',
+        cost: 450,
+        icon: '🌾',
+        desc: 'Базовый ящик фермера со спелыми плодами.',
+        pool: ['classic', 'spotted', 'green', 'pixel', 'chocolate'],
+        rates: { Common: 80, Rare: 20, Epic: 0, Legendary: 0, Mythic: 0 }
+      },
+      {
+        id: 'case_retro',
+        name: 'Ретро Волна 80-х',
+        cost: 1600,
+        icon: '📼',
+        desc: 'Яркие неоновые градиенты и синтипоп вибрации.',
+        pool: ['pixel', 'spotted', 'green', 'chocolate', 'ice', 'retrowave', 'cyber'],
+        rates: { Common: 52, Rare: 42, Epic: 6, Legendary: 0, Mythic: 0 }
+      },
+      {
+        id: 'case_neon',
+        name: 'Неоновый Сектор',
+        cost: 5200,
+        icon: '⚡',
+        desc: 'Киберпанковский кейс с огненными и редкими скинами.',
+        pool: ['spotted', 'retrowave', 'cyber', 'ice', 'steampunk', 'magma', 'matrix'],
+        rates: { Common: 32, Rare: 48, Epic: 19, Legendary: 1, Mythic: 0 }
+      },
+      {
+        id: 'case_alchemy',
+        name: 'Тайная Лаборатория',
+        cost: 16500,
+        icon: '🧪',
+        desc: 'Колбы алхимиков с изумрудными и матричными плодами.',
+        pool: ['cyber', 'ice', 'steampunk', 'alchemy', 'magma', 'matrix', 'radioactive', 'golden'],
+        rates: { Common: 10, Rare: 48, Epic: 36, Legendary: 6, Mythic: 0 }
+      },
+      {
+        id: 'case_deepspace',
+        name: 'Глубокий Космос',
+        cost: 54000,
+        icon: '🚀',
+        desc: 'Инопланетный контейнер с космическими и алмазными скинами.',
+        pool: ['steampunk', 'alchemy', 'matrix', 'radioactive', 'golden', 'cosmic_void', 'diamond'],
+        rates: { Common: 0, Rare: 38, Epic: 42, Legendary: 19, Mythic: 1 }
+      },
+      {
+        id: 'case_goldrush',
+        name: 'Золотая Лихорадка',
+        cost: 165000,
+        icon: '💰',
+        desc: 'Сокровищница старателей с огромным шансом на драгоценности.',
+        pool: ['matrix', 'radioactive', 'golden', 'cosmic_void', 'diamond', 'rainbow', 'hologram'],
+        rates: { Common: 0, Rare: 14, Epic: 44, Legendary: 37, Mythic: 5 }
+      },
+      {
+        id: 'case_god',
+        name: 'Сингулярность Богов',
+        cost: 480000,
+        icon: '👑',
+        desc: 'Элитный ларец с наивысшим шансом на мифические бананы.',
+        pool: ['golden', 'cosmic_void', 'diamond', 'rainbow', 'hologram', 'blackhole', 'divine_god'],
+        rates: { Common: 0, Rare: 0, Epic: 18, Legendary: 64, Mythic: 18 }
+      },
+      {
+        id: 'case_plasma',
+        name: 'Плазменный Реактор',
+        cost: 2500000,
+        icon: '⚡',
+        desc: 'Высокотемпературный кейс для владельцев крупных фабрик (2.5M 🍌).',
+        pool: ['radioactive', 'plasma', 'glitch', 'neon_sunset', 'ruby', 'amethyst', 'solar_flare'],
+        rates: { Common: 0, Rare: 0, Epic: 78, Legendary: 22, Mythic: 0 }
+      },
+      {
+        id: 'case_cybercity',
+        name: 'Метрополис 2099',
+        cost: 18000000,
+        icon: '🏙️',
+        desc: 'Хай-тек контейнер с обсидиановыми и самурайскими скинами (18M 🍌).',
+        pool: ['glitch', 'neon_sunset', 'ruby', 'amethyst', 'obsidian', 'cyber_samurai', 'aurora', 'superconductor'],
+        rates: { Common: 0, Rare: 0, Epic: 60, Legendary: 38, Mythic: 2 }
+      },
+      {
+        id: 'case_quantum',
+        name: 'Квантовый Контейнер',
+        cost: 120000000,
+        icon: '⚛️',
+        desc: 'Ящик с частицами антиматерии и нейтронных звёзд (120M 🍌).',
+        pool: ['obsidian', 'galaxy_spiral', 'solar_flare', 'superconductor', 'neutron_star', 'chrono_time', 'anti_matter', 'quantum_cat'],
+        rates: { Common: 0, Rare: 0, Epic: 25, Legendary: 70, Mythic: 5 }
+      },
+      {
+        id: 'case_pulsar',
+        name: 'Пульсарная Сфера',
+        cost: 850000000,
+        icon: '💫',
+        desc: 'Реликт глубокого вакуума для космических магнатов (850M 🍌).',
+        pool: ['solar_flare', 'cyber_samurai', 'neutron_star', 'chrono_time', 'anti_matter', 'quantum_cat', 'dark_energy', 'supernova'],
+        rates: { Common: 0, Rare: 0, Epic: 10, Legendary: 75, Mythic: 15 }
+      },
+      {
+        id: 'case_galaxy',
+        name: 'Галактический Сейф',
+        cost: 6000000000,
+        icon: '🌌',
+        desc: 'Сейф из ядра спиральной галактики с мультивселенским лутом (6B 🍌).',
+        pool: ['chrono_time', 'anti_matter', 'quantum_cat', 'dark_energy', 'supernova', 'multiverse', 'dimension_rift'],
+        rates: { Common: 0, Rare: 0, Epic: 0, Legendary: 65, Mythic: 35 }
+      },
+      {
+        id: 'case_multiverse',
+        name: 'Портал Мультивселенной',
+        cost: 45000000000,
+        icon: '🪐',
+        desc: 'Прямой разлом между пространственными плоскостями (45B 🍌).',
+        pool: ['quantum_cat', 'dark_energy', 'supernova', 'multiverse', 'dimension_rift', 'infinity_stone', 'omega_titan'],
+        rates: { Common: 0, Rare: 0, Epic: 0, Legendary: 40, Mythic: 60 }
+      },
+      {
+        id: 'case_infinity',
+        name: 'Ларец Бесконечности',
+        cost: 350000000000,
+        icon: '👑💎',
+        desc: 'Величайший ларец богов с Первородным Генезисом и Титанами (350B 🍌).',
+        pool: ['multiverse', 'dimension_rift', 'infinity_stone', 'omega_titan', 'creator_genesis'],
+        rates: { Common: 0, Rare: 0, Epic: 0, Legendary: 15, Mythic: 85 }
+      }
+    ];
+
+    /* =====================================================================
+       BUILDINGS DATA (12 AUTOMATIC FACTORIES - PACKING PLANT IS 1M)
+       ===================================================================== */
+    const BUILDINGS = [
+      {
+        id: 'b_cursor',
+        name: 'Авто-Очиститель',
+        icon: '👆',
+        desc: 'Автоматический очиститель банановой кожуры.',
+        baseCost: 15,
+        baseCps: 0.2,
+        count: 0
+      },
+      {
+        id: 'b_monkey',
+        name: 'Обезьянка-Сборщик',
+        icon: '🐒',
+        desc: 'Трудолюбивый примат, бережно собирающий плоды.',
+        baseCost: 100,
+        baseCps: 1.0,
+        count: 0
+      },
+      {
+        id: 'b_farm',
+        name: 'Семейная Плантация',
+        icon: '🌴',
+        desc: 'Тропическая роща на плодородной вулканической почве.',
+        baseCost: 1100,
+        baseCps: 8.0,
+        count: 0
+      },
+      {
+        id: 'b_greenhouse',
+        name: 'Гидропонная Теплица',
+        icon: '🏡',
+        desc: 'Искусственное солнце и питательные банановые растворы.',
+        baseCost: 12000,
+        baseCps: 47.0,
+        count: 0
+      },
+      {
+        id: 'b_factory',
+        name: 'Фасовочный Цех',
+        icon: '🏭',
+        desc: 'Промышленный гигант по упаковке миллионов бананов в день.',
+        baseCost: 1000000, // Exactly 1,000,000 as requested!
+        baseCps: 260.0,
+        count: 0
+      },
+      {
+        id: 'b_lab',
+        name: 'Генетическая Лаборатория',
+        icon: '🧬',
+        desc: 'Выращивание гигантских бананов с двойной сладостью.',
+        baseCost: 8500000,
+        baseCps: 1400.0,
+        count: 0
+      },
+      {
+        id: 'b_airship',
+        name: 'Грузовой Дирижабль',
+        icon: '🎈',
+        desc: 'Трансконтинентальная доставка банановых связок по воздуху.',
+        baseCost: 60000000,
+        baseCps: 7800.0,
+        count: 0
+      },
+      {
+        id: 'b_shuttle',
+        name: 'Суборбитальный Бананолёт',
+        icon: '🚀',
+        desc: 'Космическая ракета, вывозящая урожай на околоземную орбиту.',
+        baseCost: 420000000,
+        baseCps: 44000.0,
+        count: 0
+      },
+      {
+        id: 'b_station',
+        name: 'Орбитальная Станция',
+        icon: '🛰️',
+        desc: 'Космический комплекс гидропоники в невесомости.',
+        baseCost: 3200000000,
+        baseCps: 260000.0,
+        count: 0
+      },
+      {
+        id: 'b_synth',
+        name: 'Квантовый Синтезатор',
+        icon: '⚛️',
+        desc: 'Материализует бананы напрямую из космической энергии.',
+        baseCost: 25000000000,
+        baseCps: 1600000.0,
+        count: 0
+      },
+      {
+        id: 'b_reactor',
+        name: 'Сингулярный Реактор',
+        icon: '🕳️',
+        desc: 'Использует горизонт событий для генерации триллионов бананов.',
+        baseCost: 210000000000,
+        baseCps: 10500000.0,
+        count: 0
+      },
+      {
+        id: 'b_monolith',
+        name: 'Межгалактический Монолит',
+        icon: '🗿✨',
+        desc: 'Древний артефакт, искривляющий пространство в сплошной банан.',
+        baseCost: 1800000000000,
+        baseCps: 72000000.0,
+        count: 0
+      }
+    ];
+
+    /* =====================================================================
+       PLAYER STATE & LOCALSTORAGE PERSISTENCE
+       ===================================================================== */
+    let state = {
+      bananas: 0,
+      allTimeBananas: 0,
+      totalClicks: 0,
+      casesOpened: 0,
+      goldenClicks: 0,
+      ascensions: 0,
+      equippedSkinId: 'classic',
+      inventory: { 'classic': 1 },
+      freeDropTapsCurrent: 0,
+      freeDropTapsTarget: 750,
+      prestigePeels: 0,
+      spentPeels: 0,
+      secretUpgrades: {},
+      pityEpic: 0,
+      pityLegendary: 0,
+      lastSaveTime: Date.now(),
+      pendingOfflineBananas: 0,
+      settings: {
+        theme: 'default',
+        volume: 100,
+        floatingFx: true,
+        particlesFx: true,
+        glowFx: true
+      }
+    };
+
+    const SECRET_UPGRADES = [
+      {
+        id: 'upg_overdrive',
+        name: 'Банановый Сверхразгон',
+        icon: '⚡',
+        desc: '+50% ко ВСЕМУ доходу империи навсегда за каждый уровень.',
+        baseCost: 3,
+        costStep: 2,
+        maxLevel: 10,
+        effectDesc: (lvl) => `Текущий бонус: +${lvl * 50}% к доходу`
+      },
+      {
+        id: 'upg_golden_luck',
+        name: 'Золотой Резонанс',
+        icon: '🌟',
+        desc: 'Золотые Бананы появляются на 40% чаще.',
+        baseCost: 5,
+        costStep: 5,
+        maxLevel: 3,
+        effectDesc: (lvl) => `Шанс ускорен на: +${lvl * 40}%`
+      },
+      {
+        id: 'upg_mega_crit',
+        name: 'Критический Взрыв',
+        icon: '💥',
+        desc: 'Множитель критического урона возрастает с x3.5 до x6.0.',
+        baseCost: 4,
+        costStep: 4,
+        maxLevel: 1,
+        effectDesc: (lvl) => lvl > 0 ? 'Крит наносит x6.0 урона' : 'Базовый крит x3.5'
+      },
+      {
+        id: 'upg_case_discount',
+        name: 'Теневые Связи',
+        icon: '📦',
+        desc: 'Скидка 20% на стоимость открытия всех кейсов в игре.',
+        baseCost: 5,
+        costStep: 5,
+        maxLevel: 2,
+        effectDesc: (lvl) => `Скидка на кейсы: -${lvl * 20}%`
+      },
+      {
+        id: 'upg_auto_click',
+        name: 'Авто-Таппер Призрак',
+        icon: '👻',
+        desc: 'Призрачная рука автоматически тапает банан 5 раз в секунду.',
+        baseCost: 8,
+        costStep: 0,
+        maxLevel: 1,
+        effectDesc: (lvl) => lvl > 0 ? 'Активен: 5 авто-тапов/сек' : 'Неактивен'
+      },
+      {
+        id: 'upg_drop_rush',
+        name: 'Контрабанда Дропа',
+        icon: '🎁',
+        desc: 'Снижает порог бесплатного дропа с 750 кликов до 350.',
+        baseCost: 6,
+        costStep: 0,
+        maxLevel: 1,
+        effectDesc: (lvl) => lvl > 0 ? 'Цель: 350 кликов' : 'Цель: 750 кликов'
+      }
+    ];
+
+    let buyMultiplier = 1;
+    let isSpinning = false;
+    let pendingWonSkin = null;
+    let frenzyActive = false;
+    let frenzyTimer = null;
+    let currentFilter = 'all';
+    let lastFrameTime = performance.now();
+
+    const SAVE_KEY = 'galactic_banana_v5_save';
+
+    function loadGame() {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          state = { ...state, ...parsed.state };
+          if (parsed.state && parsed.state.settings) {
+            state.settings = { ...state.settings, ...parsed.state.settings };
+          }
+          if (parsed.buildings) {
+            parsed.buildings.forEach(savedB => {
+              const b = BUILDINGS.find(x => x.id === savedB.id);
+              if (b) b.count = savedB.count || 0;
+            });
+          }
+        } catch (e) {
+          console.error("Ошибка загрузки сейва", e);
+        }
+      }
+      applySettingsToUI();
+    }
+
+    function saveGame() {
+      state.lastSaveTime = Date.now();
+      const payload = {
+        state,
+        buildings: BUILDINGS.map(b => ({ id: b.id, count: b.count }))
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+    }
+
+    setInterval(saveGame, 5000);
+
+    /* =====================================================================
+       MATH, CPC & CPS CALCULATIONS
+       ===================================================================== */
+    function getEquippedSkin() {
+      return SKINS.find(s => s.id === state.equippedSkinId) || SKINS[0];
+    }
+
+    function getPrestigeMultiplier() {
+      // 20% bonus per peel earned over lifetime (including spent ones!)
+      const totalEarnedPeels = (state.prestigePeels || 0) + (state.spentPeels || 0);
+      let baseMult = 1 + (totalEarnedPeels * 0.20);
+      
+      // Secret market overdrive upgrade (+50% per level)
+      const overdriveLvl = state.secretUpgrades['upg_overdrive'] || 0;
+      baseMult *= (1 + (overdriveLvl * 0.50));
+      return baseMult;
+    }
+
+    function calculateCpc() {
+      const skin = getEquippedSkin();
+      const prestigeMult = getPrestigeMultiplier();
+      const frenzy = frenzyActive ? 7 : 1;
+      let power = 1 * skin.cpcMult * prestigeMult * frenzy;
+      return Math.max(1, Math.round(power));
+    }
+
+    function calculateCps() {
+      let raw = 0;
+      BUILDINGS.forEach(b => raw += b.count * b.baseCps);
+      const skin = getEquippedSkin();
+      const prestigeMult = getPrestigeMultiplier();
+      const frenzy = frenzyActive ? 7 : 1;
+      return raw * skin.cpsMult * prestigeMult * frenzy;
+    }
+
+    function formatNumber(val) {
+      const num = Number(val);
+      if (!isFinite(num) || isNaN(num)) return '0';
+      if (num < 1000) {
+        return (num % 1 === 0) ? num.toString() : num.toFixed(1);
+      }
+      const units = [
+        { val: 1e15, s: ' Q' },
+        { val: 1e12, s: ' T' },
+        { val: 1e9, s: ' B' },
+        { val: 1e6, s: ' M' },
+        { val: 1e3, s: ' K' }
+      ];
+      for (const u of units) {
+        if (num >= u.val) {
+          const formatted = (num / u.val).toFixed(2);
+          return formatted.replace(/\.00$/, '') + u.s;
+        }
+      }
+      return Math.floor(num).toLocaleString();
+    }
+
+    /* =====================================================================
+       PROCEDURAL STEAM-LIKE BANANA SVG RENDERER
+       ===================================================================== */
+    function renderBananaSvg(skin, width = '100%', height = '100%', uniquePrefix = 'b') {
+      const c = skin.colors;
+      const gradId = `${uniquePrefix}_grad_${skin.id}`;
+
+      return `
+        <svg viewBox="0 0 200 340" width="${width}" height="${height}" class="overflow-visible select-none pointer-events-none drop-shadow-xl" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="${c.stop1}" />
+              <stop offset="50%" stop-color="${c.stop2}" />
+              <stop offset="100%" stop-color="${c.stop3}" />
+            </linearGradient>
+            <filter id="${uniquePrefix}_softglow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="${c.stroke}" flood-opacity="0.35"/>
+            </filter>
+          </defs>
+
+          <!-- Main Curved Banana Silhouette (Faithful to Steam Banana anatomy) -->
+          <path d="M 45,35 
+                   C 80,30 120,45 152,80 
+                   C 182,118 190,175 174,225 
+                   C 160,265 125,302 78,324 
+                   C 68,328 60,320 63,310 
+                   C 88,268 114,220 114,162 
+                   C 114,115 88,68 42,46 
+                   C 36,43 38,36 45,35 Z"
+                fill="url(#${gradId})" 
+                stroke="${c.stroke}" 
+                stroke-width="3"
+                stroke-linejoin="round"
+                filter="url(#${uniquePrefix}_softglow)" />
+
+          <!-- Back Ridge Shadow Line -->
+          <path d="M 48,36 
+                   C 82,34 122,50 152,85 
+                   C 180,122 188,176 172,224"
+                fill="none" 
+                stroke="rgba(0,0,0,0.18)" 
+                stroke-width="4" 
+                stroke-linecap="round" />
+
+          <!-- Front Center Highlight Rib -->
+          <path d="M 52,48 
+                   C 88,58 126,98 132,156 
+                   C 137,212 116,255 80,300" 
+                fill="none" 
+                stroke="rgba(255,255,255,0.45)" 
+                stroke-width="5" 
+                stroke-linecap="round" />
+
+          <!-- Authentic Stem at top -->
+          <path d="M 43,36 
+                   C 40,24 35,14 30,8 
+                   C 36,7 44,9 47,15 
+                   C 49,22 49,30 46,36 Z" 
+                fill="${c.stem}" 
+                stroke="rgba(0,0,0,0.25)" 
+                stroke-width="1.5" />
+
+          <!-- Bottom Tip -->
+          <ellipse cx="68" cy="318" rx="6.5" ry="4.5" 
+                   transform="rotate(-25 68 318)" 
+                   fill="${c.tip}" />
+        </svg>
+      `;
+    }
+
+    function applySkinToBanana(skinId) {
+      const skin = SKINS.find(s => s.id === skinId) || SKINS[0];
+      state.equippedSkinId = skin.id;
+
+      const container = document.getElementById('bananaSvgContainer');
+      container.innerHTML = renderBananaSvg(skin, '100%', '100%', 'main');
+
+      document.getElementById('equippedSkinName').innerText = skin.name;
+      document.getElementById('equippedSkinBuff').innerText = skin.buffDesc;
+      
+      const badge = document.getElementById('equippedSkinBadge');
+      badge.innerText = skin.rarity;
+      badge.className = `text-[10px] uppercase font-bold px-2 py-0.5 rounded-full font-mono ${getRarityBadgeClass(skin.rarity)}`;
+
+      const aura = document.getElementById('bananaGlowAura');
+      aura.style.backgroundColor = skin.colors.stop1;
+      aura.style.opacity = state.settings.glowFx ? '0.22' : '0';
+    }
+
+    function getRarityBadgeClass(rarity) {
+      switch (rarity) {
+        case 'Common': return 'bg-slate-800 text-slate-300 border border-slate-700';
+        case 'Rare': return 'bg-sky-500/15 text-sky-300 border border-sky-500/30';
+        case 'Epic': return 'bg-purple-500/15 text-purple-300 border border-purple-500/30';
+        case 'Legendary': return 'bg-amber-500/15 text-amber-300 border border-amber-500/30';
+        case 'Mythic': return 'bg-rose-500/15 text-rose-300 border border-rose-500/30';
+        default: return 'bg-slate-800 text-slate-300';
+      }
+    }
+
+    function getRarityBorderClass(rarity) {
+      switch (rarity) {
+        case 'Common': return 'border-slate-700/60 hover:border-slate-500';
+        case 'Rare': return 'border-sky-500/30 hover:border-sky-400';
+        case 'Epic': return 'border-purple-500/30 hover:border-purple-400';
+        case 'Legendary': return 'border-amber-500/40 hover:border-amber-400';
+        case 'Mythic': return 'border-rose-500/50 hover:border-rose-400';
+        default: return 'border-slate-800';
+      }
+    }
+
+    /* =====================================================================
+       CLICKER TAP LOGIC, FLOATING PARTICLES & FREE DROP BAR
+       ===================================================================== */
+    function tapBanana(e) {
+      state.totalClicks++;
+      const skin = getEquippedSkin();
+      const cpc = calculateCpc();
+
+      const isCrit = Math.random() < skin.critChance;
+      const critMultiplier = (state.secretUpgrades['upg_mega_crit'] || 0) > 0 ? 6.0 : 3.5;
+      const gain = isCrit ? Math.round(cpc * critMultiplier) : cpc;
+
+      state.bananas += gain;
+      state.allTimeBananas += gain;
+
+      // Check drop target with secret upgrade
+      const targetTaps = (state.secretUpgrades['upg_drop_rush'] || 0) > 0 ? 350 : 750;
+      state.freeDropTapsTarget = targetTaps;
+
+      // Progress free drop
+      if (state.freeDropTapsCurrent < state.freeDropTapsTarget) {
+        state.freeDropTapsCurrent++;
+        updateFreeDropBar();
+      }
+
+      // Sounds
+      if (isCrit) {
+        playCritSfx();
+      } else {
+        playPopSfx();
+      }
+
+      // Visual punch bounce
+      const target = document.getElementById('bananaClickTarget');
+      target.classList.remove('animate-bounce-click');
+      void target.offsetWidth;
+      target.classList.add('animate-bounce-click');
+
+      // Floating number particle
+      if (state.settings.particlesFx) {
+        const clientX = e ? e.clientX : undefined;
+        const clientY = e ? e.clientY : undefined;
+        spawnFloatingNumber(clientX, clientY, gain, isCrit);
+      }
+
+      updateUI();
+    }
+
+    function spawnFloatingNumber(x, y, amount, isCrit) {
+      const el = document.createElement('div');
+      el.className = `floating-banana-text font-mono ${isCrit ? 'text-amber-300 text-xl font-black drop-shadow-[0_0_8px_#f59e0b]' : 'text-slate-100 text-sm'}`;
+      el.innerText = `${isCrit ? '💥 CRIT! +' : '+'}${formatNumber(amount)}`;
+      
+      const offsetX = (Math.random() - 0.5) * 35;
+      const offsetY = (Math.random() - 0.5) * 20;
+
+      el.style.left = `${(x || window.innerWidth / 2) + offsetX}px`;
+      el.style.top = `${(y || window.innerHeight / 2) + offsetY}px`;
+
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 900);
+    }
+
+    function updateFreeDropBar() {
+      const cur = state.freeDropTapsCurrent;
+      const tar = state.freeDropTapsTarget;
+      const pct = Math.min(100, (cur / tar) * 100);
+
+      document.getElementById('freeDropFill').style.width = `${pct}%`;
+      document.getElementById('freeDropCountText').innerText = `${cur} / ${tar} кликов`;
+
+      const btn = document.getElementById('freeDropBtn');
+      if (cur >= tar) {
+        btn.removeAttribute('disabled');
+        btn.className = "w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 animate-pulse shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer";
+        btn.innerHTML = `<span>Забрать Скин!</span> <span>🎁</span>`;
+      } else {
+        btn.setAttribute('disabled', 'true');
+        btn.className = "w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-800 text-slate-500 cursor-not-allowed shadow";
+        btn.innerHTML = `<span>Забрать Дроп</span> <span>🎁</span>`;
+      }
+    }
+
+    function claimFreeDrop() {
+      if (state.freeDropTapsCurrent < state.freeDropTapsTarget) return;
+      state.freeDropTapsCurrent = 0;
+      updateFreeDropBar();
+
+      // Free Drop has Harvest case odds
+      const chosenCase = CASES[0];
+      startRouletteSpin(chosenCase, true);
+    }
+
+    /* =====================================================================
+       CASES CATALOG & OPENING WITH SECRET DISCOUNTS
+       ===================================================================== */
+    function getCaseCost(c) {
+      const discountLvl = state.secretUpgrades['upg_case_discount'] || 0;
+      const discountPct = Math.min(0.6, discountLvl * 0.20);
+      return Math.round(c.cost * (1 - discountPct));
+    }
+
+    function openCase(caseId) {
+      if (isSpinning) return;
+      const c = CASES.find(x => x.id === caseId);
+      if (!c) return;
+
+      const finalCost = getCaseCost(c);
+      if (state.bananas < finalCost) {
+        showToast(`Недостаточно бананов! Нужно ${formatNumber(finalCost)} 🍌`, '❌');
+        return;
+      }
+
+      state.bananas -= finalCost;
+      state.casesOpened++;
+      updateUI();
+      saveGame();
+
+      startRouletteSpin(c, false);
+    }
+
+    function startRouletteSpin(caseObj, isFree = false) {
+      isSpinning = true;
+      const modal = document.getElementById('rouletteModal');
+      const track = document.getElementById('rouletteTrack');
+      const winnerCard = document.getElementById('rouletteWinnerCard');
+      const closeBtn = document.getElementById('rouletteCloseBtn');
+
+      winnerCard.classList.add('hidden');
+      closeBtn.classList.add('hidden');
+      modal.classList.remove('hidden');
+
+      document.getElementById('rouletteCaseSubtitle').innerText = `${caseObj.name} • ${caseObj.desc}`;
+
+      // Pick winner taking into account Pity System
+      state.pityEpic++;
+      state.pityLegendary++;
+
+      let targetRarity = null;
+      if (state.pityLegendary >= 75) {
+        targetRarity = 'Legendary';
+        state.pityLegendary = 0;
+        showToast('Сработал ГАРАНТ Легендарного банана!', '⭐');
+      } else if (state.pityEpic >= 25) {
+        targetRarity = 'Epic';
+        state.pityEpic = 0;
+        showToast('Сработал ГАРАНТ Эпического банана!', '🟣');
+      } else {
+        targetRarity = rollRarity(caseObj.rates);
+        if (targetRarity === 'Epic') state.pityEpic = 0;
+        if (targetRarity === 'Legendary') state.pityLegendary = 0;
+        if (targetRarity === 'Mythic') {
+          state.pityEpic = 0;
+          state.pityLegendary = 0;
+        }
+      }
+
+      // Filter pool by target rarity or fallback to pool
+      let candidates = caseObj.pool
+        .map(id => SKINS.find(s => s.id === id))
+        .filter(s => s && s.rarity === targetRarity);
+
+      if (candidates.length === 0) {
+        candidates = caseObj.pool.map(id => SKINS.find(s => s.id === id)).filter(Boolean);
+      }
+
+      const winnerSkin = candidates[Math.floor(Math.random() * candidates.length)] || SKINS[0];
+      pendingWonSkin = winnerSkin;
+
+      // Build 45 roulette items. The winner is fixed at index 38
+      const totalItems = 45;
+      const winningIndex = 38;
+      track.innerHTML = '';
+
+      const itemsList = [];
+      for (let i = 0; i < totalItems; i++) {
+        let s = winnerSkin;
+        if (i !== winningIndex) {
+          const randId = caseObj.pool[Math.floor(Math.random() * caseObj.pool.length)];
+          s = SKINS.find(x => x.id === randId) || SKINS[0];
+        }
+        itemsList.push(s);
+
+        const card = document.createElement('div');
+        card.className = `w-32 h-40 shrink-0 mx-1 rounded-xl bg-slate-900 border-2 ${getRarityBorderClass(s.rarity)} flex flex-col items-center justify-between p-2 shadow`;
+        card.innerHTML = `
+          <div class="text-[10px] font-bold uppercase font-mono ${getRarityBadgeClass(s.rarity)} px-1.5 py-0.5 rounded-full">${s.rarity}</div>
+          <div class="w-16 h-16 my-1">${renderBananaSvg(s, '100%', '100%', `roul_${i}`)}</div>
+          <div class="text-[11px] font-bold text-slate-200 truncate w-full text-center">${s.name}</div>
+        `;
+        track.appendChild(card);
+      }
+
+      // Calculate translation offset: each card is 128px + 8px margin = 136px
+      const cardWidth = 136;
+      const containerWidth = track.parentElement.offsetWidth || 650;
+      const centerTarget = containerWidth / 2;
+      const randomJitter = (Math.random() - 0.5) * 70; // natural jitter inside winning card
+      const targetOffset = (winningIndex * cardWidth) + (cardWidth / 2) - centerTarget + randomJitter;
+
+      // Reset transform
+      track.style.transition = 'none';
+      track.style.transform = 'translateX(0px)';
+
+      // Trigger audio clicks during animation
+      let lastTickTime = 0;
+      let tickInterval = null;
+
+      setTimeout(() => {
+        // Spin duration: 5.2s with realistic easing
+        track.style.transition = 'transform 5.2s cubic-bezier(0.12, 0.8, 0.2, 1)';
+        track.style.transform = `translateX(-${targetOffset}px)`;
+
+        let ticksFired = 0;
+        const totalTicks = 38;
+        const startTimestamp = performance.now();
+
+        function tickWatcher(now) {
+          const progress = (now - startTimestamp) / 5200;
+          if (progress < 1) {
+            // Frequency of ticks slows down smoothly
+            const expectedTicks = Math.floor(Math.pow(progress, 0.45) * totalTicks);
+            if (expectedTicks > ticksFired) {
+              ticksFired++;
+              playCaseTickSfx();
+            }
+            requestAnimationFrame(tickWatcher);
+          }
+        }
+        requestAnimationFrame(tickWatcher);
+      }, 50);
+
+      // On spin finished
+      setTimeout(() => {
+        isSpinning = false;
+        playWinSfx();
+
+        // Add to player inventory
+        state.inventory[winnerSkin.id] = (state.inventory[winnerSkin.id] || 0) + 1;
+
+        // Reveal winner card
+        document.getElementById('rouletteWinSvg').innerHTML = renderBananaSvg(winnerSkin, '100%', '100%', 'win_reveal');
+        document.getElementById('rouletteWinName').innerText = winnerSkin.name;
+        document.getElementById('rouletteWinRarity').innerText = winnerSkin.rarity;
+        document.getElementById('rouletteWinRarity').className = `text-xs uppercase font-mono font-bold mb-1 ${getRarityBadgeClass(winnerSkin.rarity)}`;
+        document.getElementById('rouletteWinBuff').innerText = winnerSkin.buffDesc;
+
+        winnerCard.classList.remove('hidden');
+        closeBtn.classList.remove('hidden');
+
+        renderInventory();
+        updateUI();
+        saveGame();
+      }, 5350);
+    }
+
+    function rollRarity(rates) {
+      const rand = Math.random() * 100;
+      let cumulative = 0;
+      for (const [rarity, pct] of Object.entries(rates)) {
+        cumulative += pct;
+        if (rand <= cumulative) return rarity;
+      }
+      return 'Common';
+    }
+
+    function equipWonSkin() {
+      if (pendingWonSkin) {
+        applySkinToBanana(pendingWonSkin.id);
+        showToast(`Экипирован: ${pendingWonSkin.name}`, '🍌');
+      }
+      closeRouletteModal();
+    }
+
+    function closeRouletteModal() {
+      document.getElementById('rouletteModal').classList.add('hidden');
+      isSpinning = false;
+    }
+
+    /* =====================================================================
+       INVENTORY UI, SELLING & DUPLICATE MANAGEMENT
+       ===================================================================== */
+    function renderInventory() {
+      const grid = document.getElementById('inventoryGrid');
+      grid.innerHTML = '';
+
+      const ownedSkinIds = Object.keys(state.inventory);
+      document.getElementById('headerSkinCount').innerText = `${ownedSkinIds.length}/42`;
+      document.getElementById('navInventoryCount').innerText = `${ownedSkinIds.length}/42`;
+
+      SKINS.forEach(skin => {
+        const count = state.inventory[skin.id] || 0;
+        const isEquipped = state.equippedSkinId === skin.id;
+
+        // Apply rarity filter
+        if (currentFilter !== 'all' && skin.rarity !== currentFilter) {
+          return;
+        }
+
+        const card = document.createElement('div');
+        card.className = `glass-card glass-card-hover rounded-2xl p-3 flex flex-col items-center justify-between border-2 ${getRarityBorderClass(skin.rarity)} ${count === 0 ? 'opacity-40 grayscale' : ''} relative`;
+
+        // Card badges
+        let badgeHtml = '';
+        if (count > 1) {
+          badgeHtml += `<span class="absolute top-2 left-2 text-[10px] bg-amber-500 text-slate-950 font-mono font-black px-1.5 py-0.5 rounded-lg shadow">x${count}</span>`;
+        }
+        if (isEquipped) {
+          badgeHtml += `<span class="absolute top-2 right-2 text-[10px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded-lg shadow">НАДЕТ</span>`;
+        }
+
+        card.innerHTML = `
+          ${badgeHtml}
+          <div class="text-[9px] uppercase font-mono font-bold ${getRarityBadgeClass(skin.rarity)} px-2 py-0.5 rounded-full mt-1">${skin.rarity}</div>
+          <div class="w-20 h-20 my-2">${renderBananaSvg(skin, '100%', '100%', `inv_${skin.id}`)}</div>
+          <div class="w-full text-center">
+            <div class="text-xs font-extrabold text-slate-100 truncate">${skin.name}</div>
+            <div class="text-[10px] text-slate-400 truncate mt-0.5">${skin.buffDesc}</div>
+          </div>
+          <div class="w-full mt-2.5 pt-2 border-t border-slate-800/80 flex gap-1">
+            ${count > 0 ? `
+              <button onclick="equipSkin('${skin.id}')" ${isEquipped ? 'disabled' : ''} class="flex-1 py-1.5 rounded-xl text-[11px] font-bold ${isEquipped ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-400 text-slate-950'} transition active:scale-95">
+                ${isEquipped ? 'Надет' : 'Надеть'}
+              </button>
+              ${count > 1 ? `
+                <button onclick="sellDuplicate('${skin.id}')" class="px-2 py-1.5 rounded-xl text-[10px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-amber-300 transition" title="Продать 1 дубликат за ${skin.sellPrice} бананов">
+                  💰+${formatNumber(skin.sellPrice)}
+                </button>
+              ` : ''}
+            ` : `
+              <div class="w-full py-1 text-center text-[10px] font-mono text-slate-500">Не открыт</div>
+            `}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function equipSkin(skinId) {
+      if (!state.inventory[skinId]) return;
+      applySkinToBanana(skinId);
+      playBuySfx();
+      renderInventory();
+      updateUI();
+      saveGame();
+    }
+
+    function sellDuplicate(skinId) {
+      const count = state.inventory[skinId] || 0;
+      if (count <= 1) return;
+
+      const skin = SKINS.find(s => s.id === skinId);
+      if (!skin) return;
+
+      state.inventory[skinId]--;
+      state.bananas += skin.sellPrice;
+      state.allTimeBananas += skin.sellPrice;
+
+      playBuySfx();
+      showToast(`Продан дубликат: +${formatNumber(skin.sellPrice)} 🍌`, '💰');
+      renderInventory();
+      updateUI();
+      saveGame();
+    }
+
+    function sellAllDuplicates() {
+      let totalGained = 0;
+      let duplicatesSold = 0;
+
+      Object.entries(state.inventory).forEach(([skinId, count]) => {
+        if (count > 1) {
+          const skin = SKINS.find(s => s.id === skinId);
+          if (skin) {
+            const extra = count - 1;
+            totalGained += extra * skin.sellPrice;
+            duplicatesSold += extra;
+            state.inventory[skinId] = 1;
+          }
+        }
+      });
+
+      if (duplicatesSold === 0) {
+        showToast('У вас нет повторных дубликатов для продажи.', 'ℹ️');
+        return;
+      }
+
+      state.bananas += totalGained;
+      state.allTimeBananas += totalGained;
+
+      playBuySfx();
+      showToast(`Продано ${duplicatesSold} дубликатов на сумму +${formatNumber(totalGained)} 🍌!`, '💰');
+      renderInventory();
+      updateUI();
+      saveGame();
+    }
+
+    function filterInventory(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.inv-filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-filter') === filter) {
+          btn.className = "inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition shadow";
+        } else {
+          btn.className = "inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+        }
+      });
+      renderInventory();
+    }
+
+    /* =====================================================================
+       CASES STORE & PROBABILITIES INSPECT
+       ===================================================================== */
+    function renderCasesStore() {
+      const grid = document.getElementById('casesGrid');
+      grid.innerHTML = '';
+
+      CASES.forEach(c => {
+        const finalCost = getCaseCost(c);
+        const canAfford = state.bananas >= finalCost;
+        const discountLvl = state.secretUpgrades['upg_case_discount'] || 0;
+
+        const card = document.createElement('div');
+        card.className = "glass-card glass-card-hover rounded-2xl p-4 flex flex-col justify-between border border-slate-800 shadow relative";
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl">${c.icon}</span>
+              <button onclick="inspectCase('${c.id}')" class="w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center justify-center border border-slate-700" title="Посмотреть шансы и скины">
+                ?
+              </button>
+            </div>
+            <h3 class="text-sm font-extrabold text-amber-300">${c.name}</h3>
+            <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">${c.desc}</p>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] text-slate-400 block font-semibold uppercase">Цена:</span>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-mono font-black text-amber-400">${formatNumber(finalCost)} 🍌</span>
+                ${discountLvl > 0 ? `<span class="text-[10px] text-emerald-400 font-mono font-bold">(-${discountLvl * 20}%)</span>` : ''}
+              </div>
+            </div>
+            <button onclick="openCase('${c.id}')" ${canAfford ? '' : 'disabled'} class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider ${canAfford ? 'bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 shadow-md shadow-amber-500/20 active:scale-95' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} transition">
+              Открыть
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function inspectCase(caseId) {
+      const c = CASES.find(x => x.id === caseId);
+      if (!c) return;
+
+      document.getElementById('caseInfoTitle').innerText = `${c.icon} ${c.name}`;
+      document.getElementById('caseInfoDesc').innerText = `Стоимость открытия: ${formatNumber(c.cost)} бананов`;
+
+      // Rates
+      const ratesBox = document.getElementById('caseInfoRates');
+      ratesBox.innerHTML = '';
+      Object.entries(c.rates).forEach(([rarity, pct]) => {
+        if (pct > 0) {
+          const row = document.createElement('div');
+          row.className = "flex justify-between";
+          row.innerHTML = `<span class="${getRarityBadgeClass(rarity)} px-1 rounded">${rarity}:</span> <span class="font-bold text-slate-200">${pct}%</span>`;
+          ratesBox.appendChild(row);
+        }
+      });
+
+      // Skins Pool
+      const poolBox = document.getElementById('caseInfoContent');
+      poolBox.innerHTML = '';
+      c.pool.forEach(skinId => {
+        const s = SKINS.find(x => x.id === skinId);
+        if (s) {
+          const row = document.createElement('div');
+          row.className = `flex items-center justify-between p-2 rounded-xl bg-slate-950/80 border ${getRarityBorderClass(s.rarity)}`;
+          row.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 inline-block">${renderBananaSvg(s, '100%', '100%', `insp_${s.id}`)}</span>
+              <div>
+                <span class="text-xs font-bold text-slate-200">${s.name}</span>
+                <span class="text-[9px] uppercase font-mono block ${getRarityBadgeClass(s.rarity)} w-fit px-1 rounded mt-0.5">${s.rarity}</span>
+              </div>
+            </div>
+            <span class="text-[10px] text-slate-400 text-right max-w-[120px] truncate">${s.buffDesc}</span>
+          `;
+          poolBox.appendChild(row);
+        }
+      });
+
+      document.getElementById('caseInfoModal').classList.remove('hidden');
+    }
+
+    function closeCaseInfoModal() {
+      document.getElementById('caseInfoModal').classList.add('hidden');
+    }
+
+    /* =====================================================================
+       BUILDINGS PURCHASING LOGIC
+       ===================================================================== */
+    function getBuildingCost(b, count = 1) {
+      let total = 0;
+      for (let i = 0; i < count; i++) {
+        total += Math.round(b.baseCost * Math.pow(1.15, b.count + i));
+      }
+      return total;
+    }
+
+    function buyBuilding(buildingId) {
+      const b = BUILDINGS.find(x => x.id === buildingId);
+      if (!b) return;
+
+      const cost = getBuildingCost(b, buyMultiplier);
+      if (state.bananas < cost) {
+        showToast(`Недостаточно бананов! Нужно ${formatNumber(cost)} 🍌`, '❌');
+        return;
+      }
+
+      state.bananas -= cost;
+      b.count += buyMultiplier;
+
+      playBuySfx();
+      renderBuildings();
+      updateUI();
+      saveGame();
+    }
+
+    function renderBuildings() {
+      const list = document.getElementById('buildingsList');
+      if (!list) return;
+      list.innerHTML = '';
+
+      BUILDINGS.forEach(b => {
+        const count = Number(b.count) || 0;
+        const cost = getBuildingCost(b, buyMultiplier);
+        const canAfford = state.bananas >= cost;
+        const currentTotalCps = count * b.baseCps;
+
+        const row = document.createElement('div');
+        row.className = "glass-card glass-card-hover rounded-2xl p-3.5 flex items-center justify-between gap-3 border border-slate-800/80 shadow";
+
+        row.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-2xl shrink-0 shadow">
+              ${b.icon}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <h4 class="text-xs sm:text-sm font-extrabold text-slate-200 truncate">${b.name}</h4>
+                <span class="text-xs font-mono font-bold text-amber-400">×${count}</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate mt-0.5">${b.desc}</p>
+              <div class="text-[10px] font-mono text-emerald-400 mt-0.5">
+                +${b.baseCps} CPS каждый • Всего: +${formatNumber(currentTotalCps)}/сек
+              </div>
+            </div>
+          </div>
+
+          <div class="shrink-0 text-right">
+            <button id="btn_buy_${b.id}" onclick="buyBuilding('${b.id}')" ${canAfford ? '' : 'disabled'} class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider ${canAfford ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 active:scale-95 shadow-md shadow-amber-500/20 cursor-pointer' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} transition">
+              Купить (${formatNumber(cost)})
+            </button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function setBuyMultiplier(mult) {
+      buyMultiplier = mult;
+      document.querySelectorAll('.buy-mult-btn').forEach(btn => {
+        if (parseInt(btn.getAttribute('data-mult')) === mult) {
+          btn.className = "buy-mult-btn px-3 py-1 rounded-xl text-xs font-mono font-bold bg-amber-500 text-slate-950 shadow";
+        } else {
+          btn.className = "buy-mult-btn px-3 py-1 rounded-xl text-xs font-mono font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+      });
+      renderBuildings();
+    }
+
+    /* =====================================================================
+       PRESTIGE REINCARNATION (+20% BONUS PER PEEL)
+       ===================================================================== */
+    function calculatePendingPeels() {
+      // Scale based on all time bananas: 50,000 threshold
+      const totalPeelsEarnedLifetime = (state.prestigePeels || 0) + (state.spentPeels || 0);
+      const earned = Math.floor(Math.sqrt(state.allTimeBananas / 50000));
+      return Math.max(0, earned - totalPeelsEarnedLifetime);
+    }
+
+    function updatePrestigeInfo() {
+      const pending = calculatePendingPeels();
+      const totalEarnedPeels = (state.prestigePeels || 0) + (state.spentPeels || 0);
+      const overdriveLvl = state.secretUpgrades['upg_overdrive'] || 0;
+      const overdriveBonus = overdriveLvl * 50;
+
+      document.getElementById('prestigePeelsCurrent').innerText = `${state.prestigePeels} шт. (+${totalEarnedPeels * 20 + overdriveBonus}%)`;
+      document.getElementById('prestigePeelsPending').innerText = `+${pending} шт. (+${pending * 20}%)`;
+      document.getElementById('prestigeAllTimeStat').innerText = formatNumber(state.allTimeBananas);
+      document.getElementById('topPrestigeMultiplier').innerText = `+${totalEarnedPeels * 20 + overdriveBonus}%`;
+
+      const btn = document.getElementById('prestigeExecuteBtn');
+      if (pending > 0) {
+        btn.removeAttribute('disabled');
+        btn.innerText = `✨ Совершить Сброс (+${pending} кожурок)`;
+        btn.className = "mt-6 w-full py-3.5 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer";
+      } else {
+        btn.setAttribute('disabled', 'true');
+        btn.innerText = "Нужно больше бананов для сброса";
+        btn.className = "mt-6 w-full py-3.5 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed";
+      }
+    }
+
+    function executePrestige() {
+      const pending = calculatePendingPeels();
+      if (pending <= 0) return;
+
+      showConfirmModal(
+        "Космическая Реинкарнация",
+        `Вы уверены? Ваши постройки и накопленные бананы сбросятся, но вы получите +${pending} Золотых Кожурок (+${pending * 20}% ко всей выработке навсегда), а также откроете доступ к Тайному Рынку!`,
+        "Переродиться!",
+        false,
+        () => {
+          state.prestigePeels += pending;
+          state.ascensions++;
+          state.bananas = 0;
+          BUILDINGS.forEach(b => b.count = 0);
+
+          playWinSfx();
+          showToast(`Перерождение успешно! Секретный Магазин доступен!`, "🗝️");
+
+          renderBuildings();
+          updatePrestigeInfo();
+          renderSecretShop();
+          updateUI();
+          saveGame();
+        }
+      );
+    }
+
+    /* =====================================================================
+       SECRET MARKET ENGINE & PURCHASING
+       ===================================================================== */
+    function getSecretUpgradeCost(u) {
+      const currentLevel = state.secretUpgrades[u.id] || 0;
+      return u.baseCost + (currentLevel * u.costStep);
+    }
+
+    function renderSecretShop() {
+      const isUnlocked = (state.ascensions || 0) >= 1;
+      const lockedState = document.getElementById('secretLockedState');
+      const unlockedState = document.getElementById('secretUnlockedState');
+      const navIcon = document.getElementById('navSecretIcon');
+      const navLabel = document.getElementById('navSecretLabel');
+
+      if (!isUnlocked) {
+        lockedState.classList.remove('hidden');
+        unlockedState.classList.add('hidden');
+        navIcon.innerText = '🔒';
+        navLabel.innerText = 'Секретно';
+        return;
+      }
+
+      lockedState.classList.add('hidden');
+      unlockedState.classList.remove('hidden');
+      navIcon.innerText = '🗝️';
+      navLabel.innerText = 'Рынок';
+
+      document.getElementById('secretPeelsBalance').innerText = `${state.prestigePeels} 🍌✨`;
+
+      const list = document.getElementById('secretUpgradesList');
+      list.innerHTML = '';
+
+      SECRET_UPGRADES.forEach(u => {
+        const curLvl = state.secretUpgrades[u.id] || 0;
+        const isMax = curLvl >= u.maxLevel;
+        const cost = getSecretUpgradeCost(u);
+        const canAfford = state.prestigePeels >= cost && !isMax;
+
+        const card = document.createElement('div');
+        card.className = "glass-card glass-card-hover rounded-2xl p-4 flex flex-col justify-between border border-purple-500/25 shadow";
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-3xl">${u.icon}</span>
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded-full ${isMax ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'}">
+                ${isMax ? 'MAX' : `Ур. ${curLvl}/${u.maxLevel}`}
+              </span>
+            </div>
+            <h4 class="text-sm font-black text-slate-100">${u.name}</h4>
+            <p class="text-xs text-slate-400 mt-1">${u.desc}</p>
+            <div class="text-[11px] font-mono text-purple-300 mt-2 font-semibold">
+              ${u.effectDesc(curLvl)}
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-slate-400 uppercase font-semibold block">Цена:</span>
+              <span class="text-xs font-mono font-bold text-amber-300">${isMax ? 'Куплено' : `${cost} Кожурок`}</span>
+            </div>
+            <button onclick="buySecretUpgrade('${u.id}')" ${canAfford ? '' : 'disabled'} class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider ${canAfford ? 'bg-gradient-to-r from-purple-500 to-amber-500 hover:from-purple-400 hover:to-amber-400 text-slate-950 shadow-md shadow-purple-500/25 active:scale-95 cursor-pointer' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} transition">
+              ${isMax ? 'Изучено' : 'Купить'}
+            </button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function buySecretUpgrade(upgradeId) {
+      const u = SECRET_UPGRADES.find(x => x.id === upgradeId);
+      if (!u) return;
+
+      const curLvl = state.secretUpgrades[u.id] || 0;
+      if (curLvl >= u.maxLevel) return;
+
+      const cost = getSecretUpgradeCost(u);
+      if (state.prestigePeels < cost) {
+        showToast(`Недостаточно кожурок! Нужно ${cost} 🍌✨`, '❌');
+        return;
+      }
+
+      state.prestigePeels -= cost;
+      state.spentPeels = (state.spentPeels || 0) + cost;
+      state.secretUpgrades[u.id] = curLvl + 1;
+
+      playWinSfx();
+      showToast(`Улучшение "${u.name}" приобретено!`, '🔮');
+
+      renderSecretShop();
+      renderCasesStore();
+      updatePrestigeInfo();
+      updateUI();
+      saveGame();
+    }
+
+    // Passive Ghost Auto-Clicker
+    setInterval(() => {
+      if ((state.secretUpgrades['upg_auto_click'] || 0) > 0) {
+        // Automatically taps 5 times a second
+        const cpc = calculateCpc();
+        state.bananas += cpc * 0.5;
+        state.allTimeBananas += cpc * 0.5;
+        updateUI();
+      }
+    }, 100);
+
+    function scheduleGoldenBanana() {
+      const luckLvl = state.secretUpgrades['upg_golden_luck'] || 0;
+      const speedup = 1 / (1 + (luckLvl * 0.40));
+      const delay = (35 + Math.random() * 35) * 1000 * speedup;
+      setTimeout(spawnGoldenBanana, delay);
+    }
+
+    function spawnGoldenBanana() {
+      const el = document.createElement('div');
+      el.className = "fixed z-50 cursor-pointer pointer-events-auto transition-transform active:scale-75 animate-bounce-click";
+      el.innerHTML = `
+        <div class="relative w-16 h-16 filter drop-shadow-[0_0_15px_#f59e0b] hover:scale-110 transition">
+          <span class="text-5xl block animate-spin-slow">🌟</span>
+        </div>
+      `;
+
+      const startX = Math.random() * (window.innerWidth - 80) + 40;
+      const startY = Math.random() * (window.innerHeight - 80) + 40;
+
+      el.style.left = `${startX}px`;
+      el.style.top = `${startY}px`;
+
+      el.onclick = () => {
+        state.goldenClicks++;
+        el.remove();
+        triggerFrenzy();
+      };
+
+      document.body.appendChild(el);
+
+      // Auto remove after 9 seconds if untouched
+      setTimeout(() => {
+        if (el.parentNode) {
+          el.remove();
+          scheduleGoldenBanana();
+        }
+      }, 9000);
+    }
+
+    function triggerFrenzy() {
+      frenzyActive = true;
+      playWinSfx();
+      showToast('ЗОЛОТОЙ БАНАН! БЕЗУМИЕ x7 НА 15 СЕКУНД!', '🔥');
+
+      const banner = document.getElementById('frenzyBanner');
+      const timerText = document.getElementById('frenzyTimerText');
+      banner.classList.remove('hidden');
+
+      let remaining = 15.0;
+      clearInterval(frenzyTimer);
+
+      frenzyTimer = setInterval(() => {
+        remaining -= 0.1;
+        timerText.innerText = `Осталось: ${Math.max(0, remaining).toFixed(1)}с`;
+        if (remaining <= 0) {
+          clearInterval(frenzyTimer);
+          frenzyActive = false;
+          banner.classList.add('hidden');
+          scheduleGoldenBanana();
+          updateUI();
+        }
+      }, 100);
+
+      updateUI();
+    }
+
+    function checkOfflineEarnings() {
+      if (!state.lastSaveTime) return;
+      const now = Date.now();
+      const elapsedSec = Math.floor((now - state.lastSaveTime) / 1000);
+
+      // Smooth offline gain without blocking dialogs
+      if (elapsedSec >= 15) {
+        const cps = calculateCps();
+        if (cps > 0) {
+          const cappedSec = Math.min(elapsedSec, 86400);
+          const earned = Math.floor(cappedSec * cps);
+          if (earned > 0) {
+            state.bananas += earned;
+            state.allTimeBananas += earned;
+            showToast(`С возвращением! Оффлайн добыча: +${formatNumber(earned)} 🍌`, '💤');
+          }
+        }
+      }
+      state.lastSaveTime = now;
+    }
+
+    /* =====================================================================
+       SETTINGS, PALETTES & SAVE MANAGEMENT
+       ===================================================================== */
+    function openSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    function changeTheme(themeKey) {
+      state.settings.theme = themeKey;
+      document.body.classList.remove('theme-cyber', 'theme-gold', 'theme-matrix', 'theme-synth');
+      if (themeKey !== 'default') {
+        document.body.classList.add(`theme-${themeKey}`);
+      }
+      saveGame();
+    }
+
+    function updateVolume(val) {
+      state.settings.volume = parseInt(val);
+      document.getElementById('volumeValueLabel').innerText = `${val}%`;
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('soundToggleBtn');
+      btn.innerText = soundEnabled ? '🔊' : '🔇';
+      showToast(soundEnabled ? 'Звук включен' : 'Звук выключен', soundEnabled ? '🔊' : '🔇');
+    }
+
+    function toggleSetting(key, val) {
+      state.settings[key] = val;
+      if (key === 'glowFx') {
+        applySkinToBanana(state.equippedSkinId);
+      }
+      saveGame();
+    }
+
+    function applySettingsToUI() {
+      if (state.settings.theme) {
+        changeTheme(state.settings.theme);
+        const sel = document.getElementById('themeSelect');
+        if (sel) sel.value = state.settings.theme;
+      }
+      if (state.settings.volume !== undefined) {
+        const v = document.getElementById('volumeRange');
+        if (v) v.value = state.settings.volume;
+        const vl = document.getElementById('volumeValueLabel');
+        if (vl) vl.innerText = `${state.settings.volume}%`;
+      }
+      document.getElementById('floatingFxToggle').checked = !!state.settings.floatingFx;
+      document.getElementById('particlesFxToggle').checked = !!state.settings.particlesFx;
+      document.getElementById('glowFxToggle').checked = !!state.settings.glowFx;
+    }
+
+    function exportSaveCode() {
+      const payload = {
+        state,
+        buildings: BUILDINGS.map(b => ({ id: b.id, count: b.count }))
+      };
+      const json = JSON.stringify(payload);
+      const code = btoa(encodeURIComponent(json));
+
+      const input = document.createElement('textarea');
+      input.value = code;
+      document.body.appendChild(input);
+      input.select();
+      try {
+        document.execCommand('copy');
+        showToast('Код сохранения скопирован в буфер обмена!', '💾');
+      } catch (e) {
+        prompt('Скопируйте ваш код сохранения вручную:', code);
+      }
+      input.remove();
+    }
+
+    function promptImportSave() {
+      closeSettingsModal();
+      document.getElementById('importSaveTextarea').value = '';
+      document.getElementById('saveInputModal').classList.remove('hidden');
+    }
+
+    function closeSaveInputModal() {
+      document.getElementById('saveInputModal').classList.add('hidden');
+    }
+
+    function applyImportedSave() {
+      const text = document.getElementById('importSaveTextarea').value.trim();
+      if (!text) return;
+      try {
+        const decoded = decodeURIComponent(atob(text));
+        const parsed = JSON.parse(decoded);
+        if (parsed.state) {
+          state = { ...state, ...parsed.state };
+          if (parsed.buildings) {
+            parsed.buildings.forEach(savedB => {
+              const b = BUILDINGS.find(x => x.id === savedB.id);
+              if (b) b.count = savedB.count || 0;
+            });
+          }
+          saveGame();
+          applySkinToBanana(state.equippedSkinId);
+          renderInventory();
+          renderCasesStore();
+          renderBuildings();
+          updatePrestigeInfo();
+          updateUI();
+          closeSaveInputModal();
+          showToast('Сохранение успешно загружено!', '✅');
+        }
+      } catch (err) {
+        showToast('Неверный код сохранения!', '❌');
+      }
+    }
+
+    function confirmHardReset() {
+      closeSettingsModal();
+      showConfirmModal(
+        "Полный сброс игры",
+        "Вы действительно хотите сбросить весь прогресс, бананы, скины и постройки? Это действие нельзя отменить!",
+        "Сбросить всё",
+        true,
+        () => {
+          localStorage.removeItem(SAVE_KEY);
+          location.reload();
+        }
+      );
+    }
+
+    let confirmCallback = null;
+
+    function showConfirmModal(title, msg, btnText, isDestructive, onOk) {
+      document.getElementById('confirmTitle').innerText = title;
+      document.getElementById('confirmMessage').innerText = msg;
+      const okBtn = document.getElementById('confirmOkBtn');
+      okBtn.innerText = btnText;
+      okBtn.className = isDestructive 
+        ? "flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-extrabold transition"
+        : "flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-extrabold transition";
+
+      confirmCallback = onOk;
+      okBtn.onclick = () => {
+        closeConfirmModal(true);
+        if (confirmCallback) confirmCallback();
+      };
+
+      document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal(accepted) {
+      document.getElementById('confirmModal').classList.add('hidden');
+      if (!accepted) confirmCallback = null;
+    }
+
+    /* =====================================================================
+       NAVIGATION & UI TOASTS
+       ===================================================================== */
+    function switchTab(tabId) {
+      const tabs = ['clicker', 'inventory', 'cases', 'buildings', 'prestige', 'secret'];
+      tabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`navBtn-${t}`);
+        if (!view || !btn) return;
+
+        if (t === tabId) {
+          view.classList.remove('hidden');
+          view.classList.add('flex');
+          btn.className = "flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-amber-400 text-amber-300 transition flex items-center justify-center gap-1.5 whitespace-nowrap";
+        } else {
+          view.classList.add('hidden');
+          view.classList.remove('flex');
+          btn.className = "flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap";
+        }
+      });
+
+      // Refresh content on tab switch
+      if (tabId === 'inventory') renderInventory();
+      if (tabId === 'cases') renderCasesStore();
+      if (tabId === 'buildings') renderBuildings();
+      if (tabId === 'prestige') updatePrestigeInfo();
+      if (tabId === 'secret') renderSecretShop();
+    }
+
+    function showToast(text, icon = '🍌') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = "bg-slate-900 border border-slate-700 text-slate-100 text-xs font-bold px-3.5 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 animate-bounce-click pointer-events-auto border-l-4 border-l-amber-500";
+      toast.innerHTML = `<span class="text-base">${icon}</span> <span>${text}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 350);
+      }, 2800);
+    }
+
+    /* =====================================================================
+       MAIN GAME LOOP & TICK
+       ===================================================================== */
+    function updateUI() {
+      document.getElementById('totalBananasText').innerText = formatNumber(state.bananas);
+      document.getElementById('cpsText').innerText = formatNumber(calculateCps());
+      document.getElementById('cpcText').innerText = formatNumber(calculateCpc());
+
+      const skin = getEquippedSkin();
+      document.getElementById('critChanceText').innerText = `${Math.round(skin.critChance * 100)}%`;
+
+      document.getElementById('headerPityEpic').innerText = `${state.pityEpic}/25`;
+      document.getElementById('pityEpicText').innerText = `${state.pityEpic} / 25`;
+      document.getElementById('pityLegendaryText').innerText = `${state.pityLegendary} / 75`;
+
+      BUILDINGS.forEach(b => {
+        const btn = document.getElementById(`btn_buy_${b.id}`);
+        if (btn) {
+          const cost = getBuildingCost(b, buyMultiplier);
+          const canAfford = state.bananas >= cost;
+          btn.disabled = !canAfford;
+          if (canAfford) {
+            btn.className = "px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 active:scale-95 shadow-md shadow-amber-500/20 cursor-pointer transition";
+          } else {
+            btn.className = "px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-800 text-slate-500 cursor-not-allowed transition";
+          }
+        }
+      });
+    }
+
+    function gameTick(currentTime) {
+      const dt = (currentTime - lastFrameTime) / 1000;
+      lastFrameTime = currentTime;
+
+      const cps = calculateCps();
+      if (cps > 0 && dt > 0) {
+        const gained = cps * dt;
+        state.bananas += gained;
+        state.allTimeBananas += gained;
+      }
+
+      updateUI();
+      requestAnimationFrame(gameTick);
+    }
+
+    window.onload = function() {
+      try {
+        loadGame();
+        applySkinToBanana(state.equippedSkinId);
+        renderInventory();
+        renderCasesStore();
+        renderBuildings();
+        updateFreeDropBar();
+        updatePrestigeInfo();
+        renderSecretShop();
+        updateUI();
+        scheduleGoldenBanana();
+        checkOfflineEarnings();
+      } catch (err) {
+        console.error("Initialization error:", err);
+      }
+
+      lastFrameTime = performance.now();
+      requestAnimationFrame(gameTick);
+    };
+  </script>
+</body>
+</html>
