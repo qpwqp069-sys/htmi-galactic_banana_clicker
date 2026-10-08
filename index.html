@@ -59,9 +59,20 @@
     
     .font-mono {
       font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums lining-nums;
+      -moz-font-feature-settings: "tnum" 1, "lnum" 1;
+      -webkit-font-feature-settings: "tnum" 1, "lnum" 1;
+      font-feature-settings: "tnum" 1, "lnum" 1;
     }
 
-    /* Custom scrollbar */
+    .tabular-nums {
+      font-variant-numeric: tabular-nums lining-nums;
+      -moz-font-feature-settings: "tnum" 1, "lnum" 1;
+      -webkit-font-feature-settings: "tnum" 1, "lnum" 1;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+      display: inline-block;
+    }
+
     .custom-scroll::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -78,7 +89,6 @@
       background: rgba(245, 158, 11, 0.7);
     }
 
-    /* Floating numbers on click */
     .floating-banana-text {
       position: fixed;
       pointer-events: none;
@@ -102,7 +112,6 @@
       }
     }
 
-    /* Glassmorphism containers */
     .glass-card {
       background: rgba(15, 23, 42, 0.8);
       backdrop-filter: blur(14px);
@@ -119,7 +128,6 @@
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(245, 158, 11, 0.15);
     }
 
-    /* Theme Overrides */
     body.theme-cyber {
       background: radial-gradient(circle at 50% 20%, #1e113a 0%, #0a0614 100%) !important;
     }
@@ -150,7 +158,7 @@
             <span class="inline sm:hidden">G-BANANA</span>
             <span class="hidden sm:inline">GALACTIC BANANA</span>
           </span>
-          <span class="hidden sm:inline-block text-[10px] bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono px-1.5 py-0.2 rounded-full font-bold">v5.3</span>
+          <span class="hidden sm:inline-block text-[10px] bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono px-1.5 py-0.2 rounded-full font-bold">v5.5</span>
         </div>
         <div class="hidden sm:flex text-[11px] text-slate-400 items-center gap-2">
           <span>Скины: <b id="headerSkinCount" class="text-slate-200">1/42</b></span>
@@ -160,16 +168,16 @@
       </div>
     </div>
 
-    <!-- Center: Balance Display (Optimized for Mobile & Desktop) -->
-    <div class="flex items-center gap-1 sm:gap-2.5 bg-slate-900/90 border border-amber-500/35 px-2 sm:px-3.5 py-1 rounded-xl sm:rounded-2xl shadow-inner cursor-pointer hover:border-amber-400/60 transition group shrink min-w-0" onclick="switchTab('clicker')" title="Баланс бананов (нажмите, чтобы открыть кликер)">
-      <span class="text-xs sm:text-base group-hover:scale-110 transition-transform">🍌</span>
-      <div class="flex flex-col text-left leading-none min-w-0">
+    <!-- Center: Balance Display -->
+    <div class="flex items-center gap-1 sm:gap-2.5 bg-slate-900/90 border border-amber-500/35 px-2.5 sm:px-3.5 py-1 rounded-xl sm:rounded-2xl shadow-inner cursor-pointer hover:border-amber-400/60 transition group shrink-0 min-w-[130px] sm:min-w-[195px] justify-between" onclick="switchTab('clicker')" title="Баланс бананов (нажмите, чтобы открыть кликер)">
+      <span class="text-xs sm:base group-hover:scale-110 transition-transform shrink-0">🍌</span>
+      <div class="flex flex-col text-left leading-none min-w-[65px] sm:min-w-[85px]">
         <span class="hidden xs:block text-[7px] sm:text-[9px] text-slate-400 uppercase font-semibold">Баланс</span>
-        <span id="headerBananasText" class="text-[11px] sm:text-sm font-mono font-black text-amber-300 tracking-tight sm:tracking-wide truncate">0</span>
+        <span id="headerBananasText" class="text-[11px] sm:text-sm font-mono font-black text-amber-300 tabular-nums tracking-normal">0</span>
       </div>
-      <div class="hidden md:flex flex-col text-left border-l border-slate-800 pl-2 ml-1 leading-tight">
+      <div class="hidden md:flex flex-col text-left border-l border-slate-800 pl-2 ml-1 leading-tight min-w-[60px] sm:min-w-[70px]">
         <span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-semibold">CPS</span>
-        <span id="headerCpsText" class="text-[11px] font-mono font-bold text-emerald-400">0.0</span>
+        <span id="headerCpsText" class="text-[11px] font-mono font-bold text-emerald-400 tabular-nums tracking-normal">0.0</span>
       </div>
     </div>
 
@@ -240,7 +248,7 @@
 
     <!-- FRENZY FLOATING BANNER -->
     <div id="frenzyBanner" class="hidden w-full max-w-xl mb-3 bg-gradient-to-r from-amber-600 via-red-600 to-amber-600 p-2.5 sm:p-3 rounded-2xl shadow-xl shadow-amber-500/20 text-center animate-pulse border border-amber-300/40">
-      <div class="text-[11px] sm:text-sm font-black uppercase tracking-wider text-yellow-200 flex items-center justify-center gap-2">
+      <div id="frenzyTitleText" class="text-[11px] sm:text-sm font-black uppercase tracking-wider text-yellow-200 flex items-center justify-center gap-2">
         🔥 БАНАНОВОЕ БЕЗУМИЕ (x7 К ВЫРАБОТКЕ) 🔥
       </div>
       <div id="frenzyTimerText" class="text-[10px] sm:text-[11px] font-mono text-white/90 mt-0.5">Осталось: 15.0с</div>
@@ -253,22 +261,22 @@
       <div class="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
         <div class="glass-card rounded-2xl p-2.5 sm:p-3 text-center border-amber-500/20 shadow">
           <div class="text-[9px] sm:text-[10px] text-slate-400 uppercase font-semibold">Бананы на счету</div>
-          <div id="totalBananasText" class="text-sm sm:text-xl font-mono font-black text-amber-300 truncate">0</div>
+          <div id="totalBananasText" class="text-sm sm:text-xl font-mono font-black text-amber-300 truncate tabular-nums tracking-normal">0</div>
         </div>
 
         <div class="glass-card rounded-2xl p-2.5 sm:p-3 text-center border-slate-700/50 shadow">
           <div class="text-[9px] sm:text-[10px] text-slate-400 uppercase font-semibold">Доход в сек (CPS)</div>
-          <div id="cpsText" class="text-sm sm:text-xl font-mono font-black text-emerald-400 truncate">0.0</div>
+          <div id="cpsText" class="text-sm sm:text-xl font-mono font-black text-emerald-400 truncate tabular-nums tracking-normal">0.0</div>
         </div>
 
         <div class="glass-card rounded-2xl p-2.5 sm:p-3 text-center border-slate-700/50 shadow">
           <div class="text-[9px] sm:text-[10px] text-slate-400 uppercase font-semibold">Сила клика (CPC)</div>
-          <div id="cpcText" class="text-sm sm:text-xl font-mono font-black text-sky-400 truncate">1</div>
+          <div id="cpcText" class="text-sm sm:text-xl font-mono font-black text-sky-400 truncate tabular-nums tracking-normal">1</div>
         </div>
 
         <div class="glass-card rounded-2xl p-2.5 sm:p-3 text-center border-slate-700/50 shadow">
           <div class="text-[9px] sm:text-[10px] text-slate-400 uppercase font-semibold">Шанс крита</div>
-          <div id="critChanceText" class="text-sm sm:text-xl font-mono font-black text-pink-400 truncate">5%</div>
+          <div id="critChanceText" class="text-sm sm:text-xl font-mono font-black text-pink-400 truncate tabular-nums tracking-normal">5%</div>
         </div>
       </div>
 
@@ -281,6 +289,10 @@
         <div id="bananaClickTarget" class="cursor-pointer transition-transform duration-75 select-none relative group touch-manipulation active:scale-90" onclick="tapBanana(event)">
           <div id="bananaSvgContainer" class="w-52 h-52 sm:w-80 sm:h-80 drop-shadow-2xl transition-all duration-300">
             <!-- Dynamic SVG injected here -->
+          </div>
+          <!-- Ghost tapper badge indicator if bought -->
+          <div id="ghostIndicatorBadge" class="hidden absolute top-0 right-2 bg-purple-900/80 border border-purple-400/50 text-[10px] text-purple-200 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-md animate-pulse">
+            <span>👻</span> <span>Авто-кликер</span>
           </div>
         </div>
 
@@ -351,22 +363,33 @@
 
     <!-- ==================== TAB 3: CASES ==================== -->
     <div id="view-cases" class="w-full max-w-4xl hidden flex-col gap-4 py-2">
-      <!-- Pity Status -->
-      <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-amber-500/20 shadow">
+      <!-- Pity Status & Multiplier -->
+      <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-3 border-amber-500/20 shadow">
         <div>
           <div class="text-sm font-black text-amber-300 flex items-center gap-1.5">
-            <span>🎯</span> <span>Гарант Дропа (Pity System)</span>
+            <span>🎯</span> <span>Гарант Дропа & Количество Открытия</span>
           </div>
-          <p class="text-xs text-slate-400 mt-0.5">В каждом открытом кейсе работает счетчик гарантированного выпадения ценных скинов.</p>
+          <p class="text-xs text-slate-400 mt-0.5">Открывайте 1, 3 или 5 кейсов сразу в стиле Case-Battle!</p>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="bg-slate-900/90 border border-purple-500/30 rounded-xl px-3 py-1.5 text-center">
-            <span class="text-[10px] text-purple-300 uppercase block font-semibold">Гарант Эпик</span>
-            <span id="pityEpicText" class="text-xs font-mono font-bold text-purple-400">0 / 25</span>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Multiplier buttons -->
+          <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+            <span class="text-[10px] text-slate-400 font-bold px-1.5 uppercase">Кол-во:</span>
+            <button onclick="setCaseMultiplier(1)" id="btnCaseMult-1" class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-amber-500 text-slate-950 shadow">1x</button>
+            <button onclick="setCaseMultiplier(3)" id="btnCaseMult-3" class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-800 text-slate-300 hover:bg-slate-700">3x</button>
+            <button onclick="setCaseMultiplier(5)" id="btnCaseMult-5" class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-800 text-slate-300 hover:bg-slate-700">5x</button>
           </div>
-          <div class="bg-slate-900/90 border border-amber-500/30 rounded-xl px-3 py-1.5 text-center">
-            <span class="text-[10px] text-amber-300 uppercase block font-semibold">Гарант Легендарный</span>
-            <span id="pityLegendaryText" class="text-xs font-mono font-bold text-amber-400">0 / 75</span>
+
+          <div class="flex items-center gap-2">
+            <div class="bg-slate-900/90 border border-purple-500/30 rounded-xl px-2.5 py-1 text-center">
+              <span class="text-[9px] text-purple-300 uppercase block font-semibold">Гарант Эпик</span>
+              <span id="pityEpicText" class="text-xs font-mono font-bold text-purple-400">0 / 25</span>
+            </div>
+            <div class="bg-slate-900/90 border border-amber-500/30 rounded-xl px-2.5 py-1 text-center">
+              <span class="text-[9px] text-amber-300 uppercase block font-semibold">Гарант Легенда</span>
+              <span id="pityLegendaryText" class="text-xs font-mono font-bold text-amber-400">0 / 75</span>
+            </div>
           </div>
         </div>
       </div>
@@ -404,7 +427,7 @@
         <h2 class="text-xl font-extrabold text-amber-300">Космическая Реинкарнация</h2>
         <p class="text-xs text-slate-300 mt-2 leading-relaxed max-w-md mx-auto">
           Сбросьте все накопленные бананы и фабрики в обмен на <strong class="text-amber-400">Золотые Кожурки</strong>.
-          Каждая кожурка даёт постоянный множитель <span class="text-emerald-400 font-bold">+20%</span> ко всей выработке навсегда!
+          Каждая кожурка даёт постоянный множитель <span id="prestigeBaseBonusLabel" class="text-emerald-400 font-bold">+20%</span> ко всей выработке империи навсегда!
         </p>
 
         <div class="mt-6 bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-2 text-xs font-mono">
@@ -429,7 +452,7 @@
     </div>
 
     <!-- ==================== TAB 6: SECRET MARKET ==================== -->
-    <div id="view-secret" class="w-full max-w-3xl hidden flex-col gap-4 py-2">
+    <div id="view-secret" class="w-full max-w-4xl hidden flex-col gap-4 py-2">
       
       <!-- Locked State -->
       <div id="secretLockedState" class="glass-card rounded-3xl p-8 border border-purple-500/30 text-center shadow-2xl my-auto">
@@ -459,7 +482,7 @@
               <span class="text-2xl">🗝️</span>
               <h2 class="text-lg font-black text-purple-300">Тайный Космический Рынок</h2>
             </div>
-            <p class="text-xs text-slate-400 mt-0.5">Постоянные артефакты и усиления за Золотые Кожурки.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Постоянные улучшения для мидгейма и эндгейма за Золотые Кожурки.</p>
           </div>
           <div class="flex items-center gap-2 bg-slate-900/95 border border-amber-500/30 rounded-2xl px-4 py-2 shrink-0">
             <span class="text-xs text-slate-400 uppercase font-semibold">Баланс Кожурок:</span>
@@ -476,43 +499,52 @@
 
   </main>
 
-  <!-- CASE DROP ROULETTE MODAL -->
-  <div id="rouletteModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-4">
-    <div class="bg-slate-900 border-2 border-amber-500/40 rounded-3xl max-w-3xl w-full p-6 text-center shadow-2xl relative overflow-hidden">
+  <!-- CASE DROP ROULETTE MODAL (MULTI-TRACK CAPABLE) -->
+  <div id="rouletteModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-2 border-amber-500/40 rounded-3xl max-w-4xl w-full p-4 sm:p-6 text-center shadow-2xl relative overflow-hidden flex flex-col max-h-[92vh]">
       
-      <h3 class="text-lg font-black text-amber-300 uppercase tracking-widest mb-1">ОТКРЫТИЕ КЕЙСА</h3>
-      <p id="rouletteCaseSubtitle" class="text-xs text-slate-400 mb-6">Испытайте удачу в получении редкого банана!</p>
-
-      <!-- Viewport -->
-      <div class="relative w-full h-44 bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-800 shadow-inner my-2">
-        <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-amber-400 shadow-[0_0_15px_#f59e0b] z-20 pointer-events-none"></div>
-        <div class="absolute top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-amber-400 z-20 pointer-events-none"></div>
-        <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-amber-400 z-20 pointer-events-none"></div>
-
-        <div id="rouletteTrack" class="flex items-center h-full absolute left-0 top-0 transition-transform will-change-transform">
-          <!-- Cards populated dynamically -->
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between mb-3 shrink-0">
+        <div class="text-left">
+          <h3 id="rouletteTitle" class="text-base sm:text-lg font-black text-amber-300 uppercase tracking-wider">ОТКРЫТИЕ КЕЙСА</h3>
+          <p id="rouletteCaseSubtitle" class="text-[11px] sm:text-xs text-slate-400">Испытайте удачу в получении редкого банана!</p>
         </div>
+
+        <!-- Skip Animation Button -->
+        <button id="rouletteSkipBtn" onclick="skipRouletteAnimation()" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-black uppercase tracking-wider transition active:scale-95 flex items-center gap-1.5">
+          <span>⚡</span> <span>Пропустить</span>
+        </button>
       </div>
 
-      <!-- Winner Reveal Card -->
-      <div id="rouletteWinnerCard" class="hidden flex-col items-center mt-5 p-4 rounded-2xl bg-slate-950/90 border border-amber-500/30 animate-bounce-click">
-        <div class="text-xs uppercase font-extrabold text-amber-400 tracking-wider mb-2">ВАШ ВЫИГРЫШ:</div>
-        <div id="rouletteWinSvg" class="w-24 h-24 my-1"></div>
-        <div id="rouletteWinName" class="text-lg font-extrabold text-white mt-1">Название Скина</div>
-        <div id="rouletteWinRarity" class="text-xs uppercase font-mono font-bold text-amber-300 mb-1">MYTHIC</div>
-        <div id="rouletteWinBuff" class="text-xs text-slate-400 max-w-sm">+250% ко всем показателям</div>
+      <!-- Roulette Multi-Track Container -->
+      <div id="rouletteSlotsContainer" class="w-full flex flex-col gap-2 my-1 overflow-y-auto custom-scroll pr-1 max-h-[66vh]">
+        <!-- Rendered dynamically (1, 3 or 5 tracks) -->
+      </div>
 
-        <div class="flex gap-2 w-full max-w-xs mt-4">
-          <button onclick="equipWonSkin()" class="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow active:scale-95">
-            Экипировать!
+      <!-- Multiple Winners Reveal Card -->
+      <div id="rouletteWinnersSummary" class="hidden flex-col items-center mt-3 p-3 sm:p-4 rounded-2xl bg-slate-950/95 border border-amber-500/30 animate-bounce-click overflow-y-auto custom-scroll max-h-[48vh] w-full">
+        <div class="text-xs uppercase font-extrabold text-amber-400 tracking-wider mb-2">ВАШ ДРОП:</div>
+        
+        <!-- Grid of revealed skins -->
+        <div id="rouletteWonCardsGrid" class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 my-2">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div id="rouletteScrapNotification" class="hidden text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl mt-2 w-full text-center">
+          💰 Авто-продажа дубликатов активирована (+25% к цене!)
+        </div>
+
+        <div class="flex gap-2 w-full max-w-sm mt-3 shrink-0">
+          <button onclick="equipBestWonSkin()" class="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow active:scale-95">
+            ⚡ Надеть лучшее
           </button>
-          <button onclick="closeRouletteModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition active:scale-95">
+          <button onclick="closeRouletteModal()" class="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition active:scale-95">
             В Инвентарь
           </button>
         </div>
       </div>
 
-      <button id="rouletteCloseBtn" onclick="closeRouletteModal()" class="hidden mt-4 text-xs font-bold text-slate-400 hover:text-slate-200 py-2 px-4 rounded-xl">
+      <button id="rouletteCloseBtn" onclick="closeRouletteModal()" class="hidden mt-3 text-xs font-bold text-slate-400 hover:text-slate-200 py-1.5 px-4 rounded-xl mx-auto">
         Закрыть
       </button>
 
@@ -589,6 +621,19 @@
           <input type="range" id="volumeRange" min="0" max="100" value="100" oninput="updateVolume(this.value)" class="w-full accent-amber-500 bg-slate-800 rounded-lg cursor-pointer">
         </div>
 
+        <!-- TOGGLES: FAST OPEN & GHOST SOUND -->
+        <div class="space-y-2 pt-2 border-t border-slate-800">
+          <label class="block font-bold text-slate-300">Игровой процесс & Звуки:</label>
+          <div class="flex items-center justify-between p-2 bg-slate-950/60 rounded-xl">
+            <span class="text-slate-300">Звук авто-кликера Призрака</span>
+            <input type="checkbox" id="ghostSoundToggle" checked onchange="toggleSetting('ghostSound', this.checked)" class="accent-amber-500 w-4 h-4 cursor-pointer">
+          </div>
+          <div class="flex items-center justify-between p-2 bg-slate-950/60 rounded-xl">
+            <span class="text-slate-300">Быстрое открытие кейсов (пропуск рулетки)</span>
+            <input type="checkbox" id="fastCasesToggle" onchange="toggleSetting('fastCases', this.checked)" class="accent-amber-500 w-4 h-4 cursor-pointer">
+          </div>
+        </div>
+
         <div class="space-y-2 pt-2 border-t border-slate-800">
           <label class="block font-bold text-slate-300">Визуальные эффекты:</label>
           <div class="flex items-center justify-between p-2 bg-slate-950/60 rounded-xl">
@@ -613,11 +658,13 @@
               Ввод
             </button>
           </div>
-          <p class="text-[10px] text-slate-400">Вводятся только на английском языке (регистр не имеет значения).</p>
         </div>
 
         <div class="space-y-2 pt-2 border-t border-slate-800">
-          <label class="block font-bold text-slate-300">Управление сохранением:</label>
+          <div class="flex justify-between items-center">
+            <label class="block font-bold text-slate-300">Управление сохранением:</label>
+            <span class="text-[10px] text-emerald-400 font-mono">Автосохранение: 40 сек</span>
+          </div>
           <div class="flex gap-2">
             <button onclick="exportSaveCode()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
               💾 Экспорт кода
@@ -1594,6 +1641,8 @@
       settings: {
         theme: 'default',
         volume: 100,
+        ghostSound: true,
+        fastCases: false,
         floatingFx: true,
         particlesFx: true,
         glowFx: true
@@ -1632,72 +1681,171 @@
       }
     };
 
+    /* =====================================================================
+       SECRET UPGRADES CATALOG
+       ===================================================================== */
     const SECRET_UPGRADES = [
       {
         id: 'upg_overdrive',
         name: 'Банановый Сверхразгон',
         icon: '⚡',
-        desc: '+50% ко ВСЕМУ доходу империи навсегда за каждый уровень.',
+        tier: 'early',
+        desc: 'Постоянно увеличивает весь сбор бананов на +50% за каждый уровень.',
         baseCost: 3,
         costStep: 2,
         maxLevel: 10,
-        effectDesc: (lvl) => `Текущий бонус: +${lvl * 50}% к доходу`
-      },
-      {
-        id: 'upg_golden_luck',
-        name: 'Золотой Резонанс',
-        icon: '🌟',
-        desc: 'Золотые Бананы появляются на 40% чаще.',
-        baseCost: 5,
-        costStep: 5,
-        maxLevel: 3,
-        effectDesc: (lvl) => `Шанс ускорен на: +${lvl * 40}%`
-      },
-      {
-        id: 'upg_mega_crit',
-        name: 'Критический Взрыв',
-        icon: '💥',
-        desc: 'Множитель критического урона возрастает с x3.5 до x6.0.',
-        baseCost: 4,
-        costStep: 4,
-        maxLevel: 1,
-        effectDesc: (lvl) => lvl > 0 ? 'Крит наносит x6.0 урона' : 'Базовый крит x3.5'
-      },
-      {
-        id: 'upg_case_discount',
-        name: 'Теневые Связи',
-        icon: '📦',
-        desc: 'Скидка 20% на стоимость открытия всех кейсов в игре.',
-        baseCost: 5,
-        costStep: 5,
-        maxLevel: 2,
-        effectDesc: (lvl) => `Скидка на кейсы: -${lvl * 20}%`
+        effectDesc: (lvl) => `Текущая прибавка: +${lvl * 50}% ко всему доходу`
       },
       {
         id: 'upg_auto_click',
         name: 'Авто-Таппер Призрак',
         icon: '👻',
-        desc: 'Призрачная рука автоматически тапает банан 5 раз в секунду.',
+        tier: 'early',
+        desc: 'Призрачная рука сама кликает банан 5 раз в секунду, копит бесплатный дроп и начисляет очки.',
         baseCost: 8,
         costStep: 0,
         maxLevel: 1,
-        effectDesc: (lvl) => lvl > 0 ? 'Активен: 5 авто-тапов/сек' : 'Неактивен'
+        effectDesc: (lvl) => lvl > 0 ? 'Призрак тапает без перерыва (5 тапов/сек)' : 'Не нанят'
       },
       {
         id: 'upg_drop_rush',
         name: 'Контрабанда Дропа',
         icon: '🎁',
-        desc: 'Снижает порог бесплатного дропа с 750 кликов до 350.',
-        baseCost: 6,
+        tier: 'early',
+        desc: 'Снижает планку бесплатного кейса с 750 кликов до 350.',
+        baseCost: 10,
         costStep: 0,
         maxLevel: 1,
-        effectDesc: (lvl) => lvl > 0 ? 'Цель: 350 кликов' : 'Цель: 750 кликов'
+        effectDesc: (lvl) => lvl > 0 ? 'Кейс падает за 350 кликов' : 'Стандартные 750 кликов'
+      },
+      {
+        id: 'upg_mega_crit',
+        name: 'Критический Взрыв',
+        icon: '💥',
+        tier: 'early',
+        desc: 'Критические удары становятся сокрушительными: наносят х6 урона вместо х3.5.',
+        baseCost: 15,
+        costStep: 0,
+        maxLevel: 1,
+        effectDesc: (lvl) => lvl > 0 ? 'Крит наносит x6.0 урона' : 'Стандартный крит x3.5'
+      },
+      {
+        id: 'upg_case_discount',
+        name: 'Теневые Связи',
+        icon: '📦',
+        tier: 'mid',
+        desc: 'Чёрный рынок выбивает постоянную скидку 20% на покупку абсолютно всех кейсов.',
+        baseCost: 30,
+        costStep: 40,
+        maxLevel: 2,
+        effectDesc: (lvl) => `Скидка на кейсы: -${lvl * 20}%`
+      },
+      {
+        id: 'upg_golden_luck',
+        name: 'Золотой Резонанс',
+        icon: '🌟',
+        tier: 'mid',
+        desc: 'Летящие Золотые Бананы появляются на экране в полтора раза чаще.',
+        baseCost: 40,
+        costStep: 40,
+        maxLevel: 3,
+        effectDesc: (lvl) => `Кометы летают на +${lvl * 40}% чаще`
+      },
+      {
+        id: 'upg_frenzy_boost',
+        name: 'Кометная Перегрузка',
+        icon: '🔥',
+        tier: 'mid',
+        desc: 'Увеличивает время Золотого Банана на +2 сек, а множитель безумия возрастает до х10.',
+        baseCost: 25,
+        costStep: 45,
+        maxLevel: 5,
+        effectDesc: (lvl) => lvl > 0 ? `Длительность: +${lvl * 2} сек (Безумие x${7 + Math.min(3, lvl)})` : 'Базовые 15 секунд'
+      },
+      {
+        id: 'upg_pity_boost',
+        name: 'Око Удачи',
+        icon: '🎯',
+        tier: 'mid',
+        desc: 'Снижает порог гаранта: Эпический банан падает максимум за 18 кейсов, а Легендарный — за 50.',
+        baseCost: 120,
+        costStep: 0,
+        maxLevel: 1,
+        effectDesc: (lvl) => lvl > 0 ? 'Гаранты: Эпик 18 шт, Легендарка 50 шт' : 'Стандартные гаранты (25 / 75)'
+      },
+      {
+        id: 'upg_peel_resonance',
+        name: 'Резонанс Кожуры',
+        icon: '✨',
+        tier: 'mid',
+        desc: 'Каждая оставшаяся золотая кожурка на балансе даёт +25% (или +30%) к доходу вместо +20%.',
+        baseCost: 200,
+        costStep: 300,
+        maxLevel: 2,
+        effectDesc: (lvl) => `Бонус за кожурку: +${20 + (lvl * 5)}% к выработке`
+      },
+      {
+        id: 'upg_quantum_bridge',
+        name: 'Квантовый Мост',
+        icon: '🦾',
+        tier: 'endgame',
+        desc: 'Каждый клик и каждый удар авто-таппера дополнительно дают +0.5% от секундного дохода всех фабрик!',
+        baseCost: 1200,
+        costStep: 1800,
+        maxLevel: 3,
+        effectDesc: (lvl) => `Клик получает +${(lvl * 0.5).toFixed(1)}% от CPS фабрик`
+      },
+      {
+        id: 'upg_auto_scrap',
+        name: 'Авто-Сортировщик Двойников',
+        icon: '♻️',
+        tier: 'endgame',
+        desc: 'Все повторные скины при открытии кейсов мгновенно продаются с наценкой +25% к их цене!',
+        baseCost: 2500,
+        costStep: 0,
+        maxLevel: 1,
+        effectDesc: (lvl) => lvl > 0 ? 'Повторки сразу превращаются в бананы (+25% бонус)' : 'Отключено'
+      },
+      {
+        id: 'upg_fast_start',
+        name: 'Стартовый Капитал Галактики',
+        icon: '🚀',
+        tier: 'endgame',
+        desc: 'После Престижа вы начинаете не с нуля, а с чеком на 10,000,000 бананов и первыми тремя фабриками по 25 штук!',
+        baseCost: 3500,
+        costStep: 0,
+        maxLevel: 1,
+        effectDesc: (lvl) => lvl > 0 ? 'Старт с 10M бананов и 75 начальными постройками' : 'Старт с нуля'
+      },
+      {
+        id: 'upg_mythic_boost',
+        name: 'Мифическая Гармония',
+        icon: '🪐',
+        tier: 'endgame',
+        desc: 'Удваивает числовые бонусы абсолютно всех Легендарных и Мифических бананов в вашей коллекции!',
+        baseCost: 10000,
+        costStep: 0,
+        maxLevel: 1,
+        effectDesc: (lvl) => lvl > 0 ? 'Бонусы редчайших скинов умножены на х2!' : 'Стандартные характеристики'
+      },
+      {
+        id: 'upg_infinite_core',
+        name: 'Абсолютная Сингулярность',
+        icon: '🕳️',
+        tier: 'infinite',
+        desc: 'Бесконечная чёрная дыра для лишних кожурок. Каждый уровень стабильно повышает доход всей империи на +15% навсегда.',
+        baseCost: 500,
+        costStep: 0,
+        maxLevel: 9999,
+        effectDesc: (lvl) => `Постоянный бонус: +${lvl * 15}% к доходу империи`
       }
     ];
 
     let buyMultiplier = 1;
+    let caseOpenMultiplier = 1; // 1, 3, or 5
     let isSpinning = false;
-    let pendingWonSkin = null;
+    let pendingWonSkins = [];
+    let spinTimers = [];
     let frenzyActive = false;
     let frenzyTimer = null;
     let currentFilter = 'all';
@@ -1736,21 +1884,49 @@
       localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
     }
 
-    setInterval(saveGame, 5000);
+    setInterval(saveGame, 40000);
+    window.addEventListener('beforeunload', saveGame);
 
     /* =====================================================================
        CORE CALCULATIONS
        ===================================================================== */
     function getEquippedSkin() {
-      return SKINS.find(s => s.id === state.equippedSkinId) || SKINS[0];
+      const skin = SKINS.find(s => s.id === state.equippedSkinId) || SKINS[0];
+      const mythicBoost = state.secretUpgrades['upg_mythic_boost'] || 0;
+
+      if (mythicBoost > 0 && (skin.rarity === 'Legendary' || skin.rarity === 'Mythic')) {
+        return {
+          ...skin,
+          cpcMult: skin.cpcMult * 2,
+          cpsMult: skin.cpsMult * 2,
+          critChance: Math.min(0.95, skin.critChance * 1.5)
+        };
+      }
+      return skin;
+    }
+
+    function getPeelBonusRate() {
+      const peelResLvl = state.secretUpgrades['upg_peel_resonance'] || 0;
+      return 0.20 + (peelResLvl * 0.05);
     }
 
     function getPrestigeMultiplier() {
       const totalEarnedPeels = (state.prestigePeels || 0) + (state.spentPeels || 0);
-      let baseMult = 1 + (totalEarnedPeels * 0.20);
+      const rate = getPeelBonusRate();
+      let baseMult = 1 + (totalEarnedPeels * rate);
+      
       const overdriveLvl = state.secretUpgrades['upg_overdrive'] || 0;
       baseMult *= (1 + (overdriveLvl * 0.50));
+
+      const infiniteLvl = state.secretUpgrades['upg_infinite_core'] || 0;
+      baseMult *= (1 + (infiniteLvl * 0.15));
+
       return baseMult;
+    }
+
+    function getFrenzyMultiplier() {
+      const frenzyBoost = state.secretUpgrades['upg_frenzy_boost'] || 0;
+      return 7 + Math.min(3, frenzyBoost);
     }
 
     function getAchievementClickBonus() {
@@ -1783,30 +1959,43 @@
       return bonus;
     }
 
-    function calculateCpc() {
-      const skin = getEquippedSkin();
-      const prestigeMult = getPrestigeMultiplier();
-      const frenzy = frenzyActive ? 7 : 1;
-      const achBonus = 1 + getAchievementClickBonus();
-      const power = 1 * skin.cpcMult * prestigeMult * frenzy * achBonus;
-      return Math.max(1, Math.round(power));
-    }
-
-    function calculateCps() {
+    function calculateRawCps() {
       let raw = 0;
       BUILDINGS.forEach(b => raw += b.count * b.baseCps);
       const skin = getEquippedSkin();
       const prestigeMult = getPrestigeMultiplier();
-      const frenzy = frenzyActive ? 7 : 1;
+      const frenzy = frenzyActive ? getFrenzyMultiplier() : 1;
       const achBonus = 1 + getAchievementCpsBonus();
       return raw * skin.cpsMult * prestigeMult * frenzy * achBonus;
+    }
+
+    function calculateCps() {
+      return calculateRawCps();
+    }
+
+    function calculateCpc() {
+      const skin = getEquippedSkin();
+      const prestigeMult = getPrestigeMultiplier();
+      const frenzy = frenzyActive ? getFrenzyMultiplier() : 1;
+      const achBonus = 1 + getAchievementClickBonus();
+      
+      let basePower = 1 * skin.cpcMult * prestigeMult * frenzy * achBonus;
+
+      const bridgeLvl = state.secretUpgrades['upg_quantum_bridge'] || 0;
+      if (bridgeLvl > 0) {
+        const currentCps = calculateRawCps();
+        const bridgeBonus = currentCps * (bridgeLvl * 0.005);
+        basePower += bridgeBonus;
+      }
+
+      return Math.max(1, Math.round(basePower));
     }
 
     function formatNumber(val) {
       const num = Number(val);
       if (!isFinite(num) || isNaN(num)) return '0';
       if (num < 1000) {
-        return (num % 1 === 0) ? num.toString() : num.toFixed(1);
+        return Math.floor(num).toLocaleString('ru-RU');
       }
       const units = [
         { val: 1e15, s: ' Q' },
@@ -1817,11 +2006,18 @@
       ];
       for (const u of units) {
         if (num >= u.val) {
-          const formatted = (num / u.val).toFixed(2);
-          return formatted.replace(/\.00$/, '') + u.s;
+          return (num / u.val).toFixed(2) + u.s;
         }
       }
-      return Math.floor(num).toLocaleString();
+      return Math.floor(num).toLocaleString('ru-RU');
+    }
+
+    function formatCps(val) {
+      const num = Number(val);
+      if (!isFinite(num) || isNaN(num) || num <= 0) return '0.0';
+      if (num < 10) return num.toFixed(1);
+      if (num < 1000) return Math.floor(num).toString();
+      return formatNumber(num);
     }
 
     /* =====================================================================
@@ -1899,6 +2095,15 @@
           target.classList.add('animate-float-slow');
         } else {
           target.classList.remove('animate-float-slow');
+        }
+      }
+
+      const ghostBadge = document.getElementById('ghostIndicatorBadge');
+      if (ghostBadge) {
+        if ((state.secretUpgrades['upg_auto_click'] || 0) > 0) {
+          ghostBadge.classList.remove('hidden');
+        } else {
+          ghostBadge.classList.add('hidden');
         }
       }
     }
@@ -2043,7 +2248,6 @@
       state.freeDropTapsCurrent = 0;
       updateFreeDropBar();
 
-      // Free Drop with 1% Legendary Golden chance
       const freeDropCase = {
         id: 'case_freedrop',
         name: 'Бесплатный Дроп',
@@ -2054,7 +2258,7 @@
         rates: { Common: 79, Rare: 20, Epic: 0, Legendary: 1, Mythic: 0 }
       };
 
-      startRouletteSpin(freeDropCase, true);
+      startRouletteSpin(freeDropCase, true, 1);
     }
 
     /* =====================================================================
@@ -2171,7 +2375,7 @@
     }
 
     /* =====================================================================
-       STATS DASHBOARD (CACHED, UPDATED ONCE A MINUTE)
+       STATS DASHBOARD (CACHED)
        ===================================================================== */
     let lastStatsUpdateTime = 0;
     let cachedStatsHtml = '';
@@ -2257,12 +2461,35 @@
     setInterval(() => checkAchievements(), 3000);
 
     /* =====================================================================
-       CASES & CS:GO ROULETTE
+       CASES & MULTI-OPEN CS:GO ROULETTE (1x, 3x, 5x & SKIP ANIMATION)
        ===================================================================== */
+    function setCaseMultiplier(mult) {
+      caseOpenMultiplier = mult;
+      [1, 3, 5].forEach(m => {
+        const btn = document.getElementById(`btnCaseMult-${m}`);
+        if (btn) {
+          if (m === mult) {
+            btn.className = "px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-amber-500 text-slate-950 shadow";
+          } else {
+            btn.className = "px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+          }
+        }
+      });
+      renderCasesStore();
+    }
+
     function getCaseCost(c) {
       const discountLvl = state.secretUpgrades['upg_case_discount'] || 0;
       const discountPct = Math.min(0.6, discountLvl * 0.20);
       return Math.round(c.cost * (1 - discountPct));
+    }
+
+    function getPityThresholds() {
+      const pityBoost = state.secretUpgrades['upg_pity_boost'] || 0;
+      return {
+        epic: pityBoost > 0 ? 18 : 25,
+        legendary: pityBoost > 0 ? 50 : 75
+      };
     }
 
     function openCase(caseId) {
@@ -2270,45 +2497,35 @@
       const c = CASES.find(x => x.id === caseId);
       if (!c) return;
 
-      const finalCost = getCaseCost(c);
-      if (state.bananas < finalCost) {
-        showToast(`Недостаточно бананов! Нужно ${formatNumber(finalCost)} 🍌`, '❌');
+      const singleCost = getCaseCost(c);
+      const totalCost = singleCost * caseOpenMultiplier;
+
+      if (state.bananas < totalCost) {
+        showToast(`Недостаточно бананов! Нужно ${formatNumber(totalCost)} 🍌`, '❌');
         return;
       }
 
-      state.bananas -= finalCost;
-      state.casesOpened++;
+      state.bananas -= totalCost;
+      state.casesOpened += caseOpenMultiplier;
       updateUI();
       saveGame();
 
-      startRouletteSpin(c, false);
+      startRouletteSpin(c, false, caseOpenMultiplier);
     }
 
-    function startRouletteSpin(caseObj, isFree = false) {
-      isSpinning = true;
-      const modal = document.getElementById('rouletteModal');
-      const track = document.getElementById('rouletteTrack');
-      const winnerCard = document.getElementById('rouletteWinnerCard');
-      const closeBtn = document.getElementById('rouletteCloseBtn');
-
-      winnerCard.classList.add('hidden');
-      closeBtn.classList.add('hidden');
-      modal.classList.remove('hidden');
-
-      document.getElementById('rouletteCaseSubtitle').innerText = `${caseObj.name} • ${caseObj.desc}`;
-
+    function rollWinnerForCase(caseObj) {
       state.pityEpic++;
       state.pityLegendary++;
 
+      const pityLimits = getPityThresholds();
       let targetRarity = null;
-      if (state.pityLegendary >= 75) {
+
+      if (state.pityLegendary >= pityLimits.legendary) {
         targetRarity = 'Legendary';
         state.pityLegendary = 0;
-        showToast('Сработал ГАРАНТ Легендарного банана!', '⭐');
-      } else if (state.pityEpic >= 25) {
+      } else if (state.pityEpic >= pityLimits.epic) {
         targetRarity = 'Epic';
         state.pityEpic = 0;
-        showToast('Сработал ГАРАНТ Эпического банана!', '🟣');
       } else {
         targetRarity = rollRarity(caseObj.rates);
         if (targetRarity === 'Epic') state.pityEpic = 0;
@@ -2327,80 +2544,201 @@
         candidates = caseObj.pool.map(id => SKINS.find(s => s.id === id)).filter(Boolean);
       }
 
-      const winnerSkin = candidates[Math.floor(Math.random() * candidates.length)] || SKINS[0];
-      pendingWonSkin = winnerSkin;
+      return candidates[Math.floor(Math.random() * candidates.length)] || SKINS[0];
+    }
 
-      const totalItems = 45;
-      const winningIndex = 38;
-      track.innerHTML = '';
+    function startRouletteSpin(caseObj, isFree = false, amount = 1) {
+      isSpinning = true;
+      spinTimers.forEach(t => clearTimeout(t));
+      spinTimers = [];
 
-      for (let i = 0; i < totalItems; i++) {
-        let s = winnerSkin;
-        if (i !== winningIndex) {
-          const randId = caseObj.pool[Math.floor(Math.random() * caseObj.pool.length)];
-          s = SKINS.find(x => x.id === randId) || SKINS[0];
+      const modal = document.getElementById('rouletteModal');
+      const slotsContainer = document.getElementById('rouletteSlotsContainer');
+      const winnersSummary = document.getElementById('rouletteWinnersSummary');
+      const closeBtn = document.getElementById('rouletteCloseBtn');
+      const skipBtn = document.getElementById('rouletteSkipBtn');
+      const scrapNotice = document.getElementById('rouletteScrapNotification');
+
+      winnersSummary.classList.add('hidden');
+      closeBtn.classList.add('hidden');
+      skipBtn.classList.remove('hidden');
+      if (scrapNotice) scrapNotice.classList.add('hidden');
+      modal.classList.remove('hidden');
+
+      document.getElementById('rouletteTitle').innerText = amount > 1 ? `ОТКРЫТИЕ КЕЙСОВ (${amount}x)` : `ОТКРЫТИЕ КЕЙСА`;
+      document.getElementById('rouletteCaseSubtitle').innerText = `${caseObj.name} • ${caseObj.desc}`;
+
+      pendingWonSkins = [];
+      slotsContainer.innerHTML = '';
+
+      for (let i = 0; i < amount; i++) {
+        pendingWonSkins.push(rollWinnerForCase(caseObj));
+      }
+
+      // Check Fast Cases setting
+      if (state.settings.fastCases) {
+        finishRouletteSpin();
+        return;
+      }
+
+      // Clean, valid Tailwind classes for 1x, 3x, and 5x
+      const trackHeightClass = amount === 1 ? 'h-36 sm:h-44' : (amount === 3 ? 'h-24 sm:h-28' : 'h-16 sm:h-20');
+      const cardHeightClass = amount === 1 ? 'h-32 sm:h-40 w-28 sm:w-32' : (amount === 3 ? 'h-20 sm:h-24 w-24 sm:w-28' : 'h-14 sm:h-16 w-20 sm:w-24');
+      const svgSize = amount === 1 ? 'w-14 h-14 sm:w-16 sm:h-16' : (amount === 3 ? 'w-10 h-10' : 'w-7 h-7 sm:w-8 sm:h-8');
+
+      for (let slotIdx = 0; slotIdx < amount; slotIdx++) {
+        const winnerSkin = pendingWonSkins[slotIdx];
+        const slotWrapper = document.createElement('div');
+        slotWrapper.className = `relative w-full ${trackHeightClass} bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-800 shadow-inner flex items-center shrink-0`;
+
+        slotWrapper.innerHTML = `
+          <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-amber-400 shadow-[0_0_15px_#f59e0b] z-20 pointer-events-none"></div>
+          <div class="absolute top-0.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[7px] border-t-amber-400 z-20 pointer-events-none"></div>
+          <div class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[7px] border-b-amber-400 z-20 pointer-events-none"></div>
+          <div id="rouletteTrack_${slotIdx}" class="flex items-center h-full absolute left-0 top-0 transition-transform will-change-transform"></div>
+        `;
+        slotsContainer.appendChild(slotWrapper);
+
+        const track = slotWrapper.querySelector(`#rouletteTrack_${slotIdx}`);
+        const totalItems = 45;
+        const winningIndex = 38;
+
+        for (let i = 0; i < totalItems; i++) {
+          let s = winnerSkin;
+          if (i !== winningIndex) {
+            const randId = caseObj.pool[Math.floor(Math.random() * caseObj.pool.length)];
+            s = SKINS.find(x => x.id === randId) || SKINS[0];
+          }
+
+          const card = document.createElement('div');
+          card.className = `${cardHeightClass} shrink-0 mx-1 rounded-xl bg-slate-900 border-2 ${getRarityBorderClass(s.rarity)} flex flex-col items-center justify-between p-1 sm:p-1.5 shadow`;
+          card.innerHTML = `
+            <div class="text-[7px] sm:text-[9px] font-bold uppercase font-mono ${getRarityBadgeClass(s.rarity)} px-1.5 rounded-full">${s.rarity}</div>
+            <div class="${svgSize} my-0.5">${renderBananaSvg(s, '100%', '100%', `roul_${slotIdx}_${i}`)}</div>
+            <div class="text-[8px] sm:text-[10px] font-bold text-slate-200 truncate w-full text-center">${s.name}</div>
+          `;
+          track.appendChild(card);
+        }
+
+        // Dynamically compute exact card width including mx-1 margins
+        const firstCardEl = track.children[0];
+        const cardWidth = (firstCardEl && firstCardEl.offsetWidth > 0)
+          ? (firstCardEl.offsetWidth + 8)
+          : (amount === 1 ? (window.innerWidth < 640 ? 120 : 136) : (amount === 3 ? (window.innerWidth < 640 ? 104 : 120) : (window.innerWidth < 640 ? 88 : 104)));
+
+        const containerWidth = slotWrapper.offsetWidth || 700;
+        const centerTarget = containerWidth / 2;
+        const randomJitter = (Math.random() - 0.5) * 36;
+        const targetOffset = (winningIndex * cardWidth) + (cardWidth / 2) - centerTarget + randomJitter;
+
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0px)';
+
+        const timerStart = setTimeout(() => {
+          track.style.transition = 'transform 5.2s cubic-bezier(0.12, 0.8, 0.2, 1)';
+          track.style.transform = `translateX(-${targetOffset}px)`;
+        }, 50 + (slotIdx * 35));
+        spinTimers.push(timerStart);
+      }
+
+      // Ticker sounds
+      let ticksFired = 0;
+      const totalTicks = 38;
+      const startTimestamp = performance.now();
+
+      function tickWatcher(now) {
+        if (!isSpinning) return;
+        const progress = (now - startTimestamp) / 5200;
+        if (progress < 1) {
+          const expectedTicks = Math.floor(Math.pow(progress, 0.45) * totalTicks);
+          if (expectedTicks > ticksFired) {
+            ticksFired++;
+            playCaseTickSfx();
+          }
+          requestAnimationFrame(tickWatcher);
+        }
+      }
+      requestAnimationFrame(tickWatcher);
+
+      const finishTimer = setTimeout(() => {
+        finishRouletteSpin();
+      }, 5450);
+      spinTimers.push(finishTimer);
+    }
+
+    function skipRouletteAnimation() {
+      if (!isSpinning) return;
+      spinTimers.forEach(t => clearTimeout(t));
+      spinTimers = [];
+      finishRouletteSpin();
+    }
+
+    function finishRouletteSpin() {
+      isSpinning = false;
+      playWinSfx();
+
+      document.getElementById('rouletteSkipBtn').classList.add('hidden');
+      const slotsContainer = document.getElementById('rouletteSlotsContainer');
+      slotsContainer.innerHTML = '';
+
+      const winnersSummary = document.getElementById('rouletteWinnersSummary');
+      const cardsGrid = document.getElementById('rouletteWonCardsGrid');
+      const scrapNotice = document.getElementById('rouletteScrapNotification');
+      const closeBtn = document.getElementById('rouletteCloseBtn');
+
+      cardsGrid.innerHTML = '';
+
+      let totalAutoScrapBananas = 0;
+      let duplicatesSold = 0;
+      const autoScrapActive = (state.secretUpgrades['upg_auto_scrap'] || 0) > 0;
+
+      pendingWonSkins.forEach((skin, idx) => {
+        const alreadyOwned = (state.inventory[skin.id] || 0) > 0;
+        let isScrapped = false;
+
+        if (alreadyOwned && autoScrapActive) {
+          const scrapVal = Math.round(skin.sellPrice * 1.25);
+          state.bananas += scrapVal;
+          state.allTimeBananas += scrapVal;
+          totalAutoScrapBananas += scrapVal;
+          duplicatesSold++;
+          isScrapped = true;
+        } else {
+          state.inventory[skin.id] = (state.inventory[skin.id] || 0) + 1;
         }
 
         const card = document.createElement('div');
-        card.className = `w-32 h-40 shrink-0 mx-1 rounded-xl bg-slate-900 border-2 ${getRarityBorderClass(s.rarity)} flex flex-col items-center justify-between p-2 shadow`;
+        card.className = `p-3 rounded-2xl bg-slate-900 border-2 ${getRarityBorderClass(skin.rarity)} flex flex-col items-center justify-between text-center relative`;
         card.innerHTML = `
-          <div class="text-[10px] font-bold uppercase font-mono ${getRarityBadgeClass(s.rarity)} px-1.5 py-0.5 rounded-full">${s.rarity}</div>
-          <div class="w-16 h-16 my-1">${renderBananaSvg(s, '100%', '100%', `roul_${i}`)}</div>
-          <div class="text-[11px] font-bold text-slate-200 truncate w-full text-center">${s.name}</div>
+          <div class="text-[9px] uppercase font-mono font-bold ${getRarityBadgeClass(skin.rarity)} px-2 py-0.5 rounded-full mb-1">${skin.rarity}</div>
+          <div class="w-16 h-16 my-1">${renderBananaSvg(skin, '100%', '100%', `won_${idx}`)}</div>
+          <div class="text-xs font-black text-white truncate w-full">${skin.name}</div>
+          <div class="text-[10px] text-slate-400 truncate w-full mt-0.5">${skin.buffDesc}</div>
+          ${isScrapped ? `
+            <div class="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-lg mt-2">
+              💰 Продан (+25%)
+            </div>
+          ` : `
+            <button onclick="equipSpecificWonSkin('${skin.id}')" class="mt-2 w-full py-1 rounded-lg text-[10px] font-black uppercase bg-amber-500 hover:bg-amber-400 text-slate-950 transition active:scale-95">
+              Надеть
+            </button>
+          `}
         `;
-        track.appendChild(card);
+        cardsGrid.appendChild(card);
+      });
+
+      if (duplicatesSold > 0 && scrapNotice) {
+        scrapNotice.innerText = `💰 Авто-продано ${duplicatesSold} дубликатов на сумму +${formatNumber(totalAutoScrapBananas)} 🍌 (+25% к цене!)`;
+        scrapNotice.classList.remove('hidden');
+        showToast(`Продано ${duplicatesSold} повторок (+${formatNumber(totalAutoScrapBananas)} 🍌)!`, '♻️');
       }
 
-      const cardWidth = 136;
-      const containerWidth = track.parentElement.offsetWidth || 650;
-      const centerTarget = containerWidth / 2;
-      const randomJitter = (Math.random() - 0.5) * 70;
-      const targetOffset = (winningIndex * cardWidth) + (cardWidth / 2) - centerTarget + randomJitter;
+      winnersSummary.classList.remove('hidden');
+      closeBtn.classList.remove('hidden');
 
-      track.style.transition = 'none';
-      track.style.transform = 'translateX(0px)';
-
-      setTimeout(() => {
-        track.style.transition = 'transform 5.2s cubic-bezier(0.12, 0.8, 0.2, 1)';
-        track.style.transform = `translateX(-${targetOffset}px)`;
-
-        let ticksFired = 0;
-        const totalTicks = 38;
-        const startTimestamp = performance.now();
-
-        function tickWatcher(now) {
-          const progress = (now - startTimestamp) / 5200;
-          if (progress < 1) {
-            const expectedTicks = Math.floor(Math.pow(progress, 0.45) * totalTicks);
-            if (expectedTicks > ticksFired) {
-              ticksFired++;
-              playCaseTickSfx();
-            }
-            requestAnimationFrame(tickWatcher);
-          }
-        }
-        requestAnimationFrame(tickWatcher);
-      }, 50);
-
-      setTimeout(() => {
-        isSpinning = false;
-        playWinSfx();
-
-        state.inventory[winnerSkin.id] = (state.inventory[winnerSkin.id] || 0) + 1;
-
-        document.getElementById('rouletteWinSvg').innerHTML = renderBananaSvg(winnerSkin, '100%', '100%', 'win_reveal');
-        document.getElementById('rouletteWinName').innerText = winnerSkin.name;
-        document.getElementById('rouletteWinRarity').innerText = winnerSkin.rarity;
-        document.getElementById('rouletteWinRarity').className = `text-xs uppercase font-mono font-bold mb-1 ${getRarityBadgeClass(winnerSkin.rarity)}`;
-        document.getElementById('rouletteWinBuff').innerText = winnerSkin.buffDesc;
-
-        winnerCard.classList.remove('hidden');
-        closeBtn.classList.remove('hidden');
-
-        renderInventory();
-        updateUI();
-        saveGame();
-      }, 5350);
+      renderInventory();
+      updateUI();
+      saveGame();
     }
 
     function rollRarity(rates) {
@@ -2413,17 +2751,35 @@
       return 'Common';
     }
 
-    function equipWonSkin() {
-      if (pendingWonSkin) {
-        applySkinToBanana(pendingWonSkin.id);
-        showToast(`Экипирован: ${pendingWonSkin.name}`, '🍌');
-      }
+    function equipSpecificWonSkin(skinId) {
+      applySkinToBanana(skinId);
+      showToast(`Экипирован скин!`, '🍌');
+      closeRouletteModal();
+    }
+
+    function equipBestWonSkin() {
+      if (pendingWonSkins.length === 0) return;
+      let best = pendingWonSkins[0];
+      let bestScore = getSkinPowerScore(best);
+
+      pendingWonSkins.forEach(s => {
+        const sc = getSkinPowerScore(s);
+        if (sc > bestScore) {
+          bestScore = sc;
+          best = s;
+        }
+      });
+
+      applySkinToBanana(best.id);
+      showToast(`Экипирован лучший: ${best.name}!`, '⚡');
       closeRouletteModal();
     }
 
     function closeRouletteModal() {
       document.getElementById('rouletteModal').classList.add('hidden');
       isSpinning = false;
+      spinTimers.forEach(t => clearTimeout(t));
+      spinTimers = [];
     }
 
     /* =====================================================================
@@ -2603,8 +2959,9 @@
       grid.innerHTML = '';
 
       CASES.forEach(c => {
-        const finalCost = getCaseCost(c);
-        const canAfford = state.bananas >= finalCost;
+        const singleCost = getCaseCost(c);
+        const totalCost = singleCost * caseOpenMultiplier;
+        const canAfford = state.bananas >= totalCost;
         const discountLvl = state.secretUpgrades['upg_case_discount'] || 0;
 
         const card = document.createElement('div');
@@ -2624,14 +2981,14 @@
 
           <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
             <div>
-              <span class="text-[10px] text-slate-400 block font-semibold uppercase">Цена:</span>
+              <span class="text-[10px] text-slate-400 block font-semibold uppercase">Цена (${caseOpenMultiplier}x):</span>
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-mono font-black text-amber-400">${formatNumber(finalCost)} 🍌</span>
+                <span class="text-xs font-mono font-black text-amber-400">${formatNumber(totalCost)} 🍌</span>
                 ${discountLvl > 0 ? `<span class="text-[10px] text-emerald-400 font-mono font-bold">(-${discountLvl * 20}%)</span>` : ''}
               </div>
             </div>
             <button onclick="openCase('${c.id}')" ${canAfford ? '' : 'disabled'} class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider ${canAfford ? 'bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 shadow-md shadow-amber-500/20 active:scale-95' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} transition">
-              Открыть
+              Открыть (${caseOpenMultiplier}x)
             </button>
           </div>
         `;
@@ -2769,7 +3126,7 @@
     }
 
     /* =====================================================================
-       PRESTIGE REINCARNATION (+20% BONUS PER PEEL)
+       PRESTIGE REINCARNATION (+20%..+30% BONUS PER PEEL)
        ===================================================================== */
     function calculatePendingPeels() {
       const totalPeelsEarnedLifetime = (state.prestigePeels || 0) + (state.spentPeels || 0);
@@ -2779,16 +3136,19 @@
 
     function updatePrestigeInfo() {
       const pending = calculatePendingPeels();
-      const totalEarnedPeels = (state.prestigePeels || 0) + (state.spentPeels || 0);
-      const overdriveLvl = state.secretUpgrades['upg_overdrive'] || 0;
-      const overdriveBonus = overdriveLvl * 50;
+      const rate = getPeelBonusRate();
+      const basePct = Math.round(rate * 100);
+      const totalMultiplierPct = Math.round((getPrestigeMultiplier() - 1) * 100);
 
-      document.getElementById('prestigePeelsCurrent').innerText = `${state.prestigePeels} шт. (+${totalEarnedPeels * 20 + overdriveBonus}%)`;
-      document.getElementById('prestigePeelsPending').innerText = `+${pending} шт. (+${pending * 20}%)`;
+      const baseBonusLabel = document.getElementById('prestigeBaseBonusLabel');
+      if (baseBonusLabel) baseBonusLabel.innerText = `+${basePct}%`;
+
+      document.getElementById('prestigePeelsCurrent').innerText = `${state.prestigePeels} шт. (+${totalMultiplierPct}%)`;
+      document.getElementById('prestigePeelsPending').innerText = `+${pending} шт. (+${pending * basePct}%)`;
       document.getElementById('prestigeAllTimeStat').innerText = formatNumber(state.allTimeBananas);
       
       const topPresMultiplier = document.getElementById('topPrestigeMultiplier');
-      if (topPresMultiplier) topPresMultiplier.innerText = `+${totalEarnedPeels * 20 + overdriveBonus}%`;
+      if (topPresMultiplier) topPresMultiplier.innerText = `+${totalMultiplierPct}%`;
 
       const btn = document.getElementById('prestigeExecuteBtn');
       if (pending > 0) {
@@ -2806,19 +3166,35 @@
       const pending = calculatePendingPeels();
       if (pending <= 0) return;
 
+      const rate = getPeelBonusRate();
+      const pctPerPeel = Math.round(rate * 100);
+
       showConfirmModal(
         "Космическая Реинкарнация",
-        `Вы уверены? Ваши постройки и накопленные бананы сбросятся, но вы получите +${pending} Золотых Кожурок (+${pending * 20}% ко всей выработке навсегда), а также откроете доступ к Тайному Рынку!`,
+        `Вы уверены? Ваши постройки и накопленные бананы сбросятся, но вы получите +${pending} Золотых Кожурок (+${pending * pctPerPeel}% ко всей выработке навсегда), а также откроете доступ к Тайному Рынку!`,
         "Переродиться!",
         false,
         () => {
           state.prestigePeels += pending;
           state.ascensions++;
-          state.bananas = 0;
-          BUILDINGS.forEach(b => b.count = 0);
+          
+          const fastStart = state.secretUpgrades['upg_fast_start'] || 0;
+          if (fastStart > 0) {
+            state.bananas = 10000000;
+            BUILDINGS[0].count = 25;
+            BUILDINGS[1].count = 25;
+            BUILDINGS[2].count = 25;
+            for (let i = 3; i < BUILDINGS.length; i++) {
+              BUILDINGS[i].count = 0;
+            }
+            showToast("Активирован Стартовый Капитал: +10M 🍌 и 75 фабрик!", "🚀");
+          } else {
+            state.bananas = 0;
+            BUILDINGS.forEach(b => b.count = 0);
+          }
 
           playWinSfx();
-          showToast(`Перерождение успешно! Секретный Магазин доступен!`, "🗝️");
+          showToast(`Перерождение успешно! Получено +${pending} кожурок!`, "🗝️");
 
           renderBuildings();
           updatePrestigeInfo();
@@ -2834,6 +3210,9 @@
        ===================================================================== */
     function getSecretUpgradeCost(u) {
       const currentLevel = state.secretUpgrades[u.id] || 0;
+      if (u.id === 'upg_infinite_core') {
+        return Math.round(500 * Math.pow(1.5, currentLevel));
+      }
       return u.baseCost + (currentLevel * u.costStep);
     }
 
@@ -2864,23 +3243,26 @@
 
       SECRET_UPGRADES.forEach(u => {
         const curLvl = state.secretUpgrades[u.id] || 0;
-        const isMax = curLvl >= u.maxLevel;
+        const isMax = u.id !== 'upg_infinite_core' && curLvl >= u.maxLevel;
         const cost = getSecretUpgradeCost(u);
         const canAfford = state.prestigePeels >= cost && !isMax;
 
         const card = document.createElement('div');
         card.className = "glass-card glass-card-hover rounded-2xl p-4 flex flex-col justify-between border border-purple-500/25 shadow";
 
+        let badgeText = isMax ? 'ИЗУЧЕНО' : (u.id === 'upg_infinite_core' ? `Ур. ${curLvl}` : `Ур. ${curLvl}/${u.maxLevel}`);
+        let badgeColor = isMax ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border border-purple-500/30';
+
         card.innerHTML = `
           <div>
             <div class="flex items-center justify-between mb-2">
               <span class="text-3xl">${u.icon}</span>
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded-full ${isMax ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'}">
-                ${isMax ? 'MAX' : `Ур. ${curLvl}/${u.maxLevel}`}
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded-full ${badgeColor}">
+                ${badgeText}
               </span>
             </div>
             <h4 class="text-sm font-black text-slate-100">${u.name}</h4>
-            <p class="text-xs text-slate-400 mt-1">${u.desc}</p>
+            <p class="text-xs text-slate-300 mt-1 leading-relaxed">${u.desc}</p>
             <div class="text-[11px] font-mono text-purple-300 mt-2 font-semibold">
               ${u.effectDesc(curLvl)}
             </div>
@@ -2889,10 +3271,10 @@
           <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
             <div>
               <span class="text-[10px] text-slate-400 uppercase font-semibold block">Цена:</span>
-              <span class="text-xs font-mono font-bold text-amber-300">${isMax ? 'Куплено' : `${cost} Кожурок`}</span>
+              <span class="text-xs font-mono font-bold text-amber-300">${isMax ? 'Куплено' : `${formatNumber(cost)} Кожурок`}</span>
             </div>
             <button onclick="buySecretUpgrade('${u.id}')" ${canAfford ? '' : 'disabled'} class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider ${canAfford ? 'bg-gradient-to-r from-purple-500 to-amber-500 hover:from-purple-400 hover:to-amber-400 text-slate-950 shadow-md shadow-purple-500/25 active:scale-95 cursor-pointer' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} transition">
-              ${isMax ? 'Изучено' : 'Купить'}
+              ${isMax ? 'Максимум' : 'Купить'}
             </button>
           </div>
         `;
@@ -2905,11 +3287,11 @@
       if (!u) return;
 
       const curLvl = state.secretUpgrades[u.id] || 0;
-      if (curLvl >= u.maxLevel) return;
+      if (u.id !== 'upg_infinite_core' && curLvl >= u.maxLevel) return;
 
       const cost = getSecretUpgradeCost(u);
       if (state.prestigePeels < cost) {
-        showToast(`Недостаточно кожурок! Нужно ${cost} 🍌✨`, '❌');
+        showToast(`Недостаточно кожурок! Нужно ${formatNumber(cost)} 🍌✨`, '❌');
         return;
       }
 
@@ -2920,6 +3302,11 @@
       playWinSfx();
       showToast(`Улучшение "${u.name}" приобретено!`, '🔮');
 
+      if (u.id === 'upg_auto_click') {
+        const ghostBadge = document.getElementById('ghostIndicatorBadge');
+        if (ghostBadge) ghostBadge.classList.remove('hidden');
+      }
+
       renderSecretShop();
       renderCasesStore();
       updatePrestigeInfo();
@@ -2927,14 +3314,25 @@
       saveGame();
     }
 
+    /* =====================================================================
+       GHOST AUTO-TAPPER ENGINE (WITH MUTE OPTION)
+       ===================================================================== */
     setInterval(() => {
       if ((state.secretUpgrades['upg_auto_click'] || 0) > 0) {
         const cpc = calculateCpc();
-        state.bananas += cpc * 0.5;
-        state.allTimeBananas += cpc * 0.5;
+        state.bananas += cpc;
+        state.allTimeBananas += cpc;
+        state.totalClicks++;
+
+        incrementFreeDrop();
+
+        if (state.settings.ghostSound !== false && Math.random() < 0.25) {
+          playPopSfx();
+        }
+
         updateUI();
       }
-    }, 100);
+    }, 200);
 
     /* =====================================================================
        GOLDEN BANANA EVENT & OFFLINE EARNINGS
@@ -2980,13 +3378,23 @@
     function triggerFrenzy() {
       frenzyActive = true;
       playWinSfx();
-      showToast('ЗОЛОТОЙ БАНАН! БЕЗУМИЕ x7 НА 15 СЕКУНД!', '🔥');
+      
+      const frenzyMult = getFrenzyMultiplier();
+      const frenzyBoost = state.secretUpgrades['upg_frenzy_boost'] || 0;
+      const totalDuration = 15.0 + (frenzyBoost * 2);
+
+      showToast(`ЗОЛОТОЙ БАНАН! БЕЗУМИЕ x${frenzyMult} НА ${totalDuration} СЕК!`, '🔥');
 
       const banner = document.getElementById('frenzyBanner');
       const timerText = document.getElementById('frenzyTimerText');
+      const titleText = document.getElementById('frenzyTitleText');
+
+      if (titleText) {
+        titleText.innerText = `🔥 БАНАНОВОЕ БЕЗУМИЕ (x${frenzyMult} К ВЫРАБОТКЕ) 🔥`;
+      }
       banner.classList.remove('hidden');
 
-      let remaining = 15.0;
+      let remaining = totalDuration;
       clearInterval(frenzyTimer);
 
       frenzyTimer = setInterval(() => {
@@ -3076,6 +3484,13 @@
         const vl = document.getElementById('volumeValueLabel');
         if (vl) vl.innerText = `${state.settings.volume}%`;
       }
+      
+      const ghostSoundEl = document.getElementById('ghostSoundToggle');
+      if (ghostSoundEl) ghostSoundEl.checked = state.settings.ghostSound !== false;
+
+      const fastCasesEl = document.getElementById('fastCasesToggle');
+      if (fastCasesEl) fastCasesEl.checked = !!state.settings.fastCases;
+
       document.getElementById('floatingFxToggle').checked = !!state.settings.floatingFx;
       document.getElementById('particlesFxToggle').checked = !!state.settings.particlesFx;
       document.getElementById('glowFxToggle').checked = !!state.settings.glowFx;
@@ -3136,6 +3551,7 @@
           updateAchievementsBadge();
           checkAchievements();
           updateStatsSnapshot(true);
+          renderSecretShop();
           updateUI();
           closeSaveInputModal();
           showToast('Сохранение успешно загружено!', '✅');
@@ -3237,19 +3653,20 @@
       if (headerBananas) headerBananas.innerText = formatNumber(state.bananas);
 
       const headerCps = document.getElementById('headerCpsText');
-      if (headerCps) headerCps.innerText = formatNumber(calculateCps());
+      if (headerCps) headerCps.innerText = formatCps(calculateCps());
 
-      document.getElementById('cpsText').innerText = formatNumber(calculateCps());
+      document.getElementById('cpsText').innerText = formatCps(calculateCps());
       document.getElementById('cpcText').innerText = formatNumber(calculateCpc());
 
       const skin = getEquippedSkin();
       document.getElementById('critChanceText').innerText = `${Math.round(skin.critChance * 100)}%`;
 
+      const pityLimits = getPityThresholds();
       const headerPity = document.getElementById('headerPityEpic');
-      if (headerPity) headerPity.innerText = `${state.pityEpic}/25`;
+      if (headerPity) headerPity.innerText = `${state.pityEpic}/${pityLimits.epic}`;
 
-      document.getElementById('pityEpicText').innerText = `${state.pityEpic} / 25`;
-      document.getElementById('pityLegendaryText').innerText = `${state.pityLegendary} / 75`;
+      document.getElementById('pityEpicText').innerText = `${state.pityEpic} / ${pityLimits.epic}`;
+      document.getElementById('pityLegendaryText').innerText = `${state.pityLegendary} / ${pityLimits.legendary}`;
 
       BUILDINGS.forEach(b => {
         const btn = document.getElementById(`btn_buy_${b.id}`);
