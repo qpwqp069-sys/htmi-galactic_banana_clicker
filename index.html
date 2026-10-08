@@ -2,7 +2,7 @@
 <html lang="ru" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Космический Банан: Galactic Banana Clicker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -10,6 +10,9 @@
       darkMode: 'class',
       theme: {
         extend: {
+          screens: {
+            'xs': '420px'
+          },
           colors: {
             rarityCommon: '#94A3B8',
             rarityRare: '#38BDF8',
@@ -51,24 +54,25 @@
       -webkit-user-select: none;
       box-sizing: border-box;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      touch-action: manipulation;
     }
     
     .font-mono {
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Custom scrollbar for mouse wheel convenience */
+    /* Custom scrollbar */
     .custom-scroll::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
     }
     .custom-scroll::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.6);
-      border-radius: 8px;
+      border-radius: 6px;
     }
     .custom-scroll::-webkit-scrollbar-thumb {
       background: rgba(245, 158, 11, 0.4);
-      border-radius: 8px;
+      border-radius: 6px;
     }
     .custom-scroll::-webkit-scrollbar-thumb:hover {
       background: rgba(245, 158, 11, 0.7);
@@ -100,7 +104,7 @@
 
     /* Glassmorphism containers */
     .glass-card {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.8);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -132,137 +136,174 @@
 </head>
 <body id="appBody" class="bg-slate-950 text-slate-100 min-h-screen h-[100dvh] flex flex-col overflow-hidden selection:bg-amber-500 selection:text-slate-950">
 
-  <!-- TOP STATUS BAR -->
-  <header class="glass-card border-b border-slate-800/80 px-3 sm:px-6 py-2.5 flex items-center justify-between shrink-0 z-30 shadow-md">
-    <!-- Brand & Level Info -->
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-xl shadow-lg shadow-amber-500/25 cursor-pointer transform hover:rotate-12 transition" onclick="switchTab('clicker')">
+  <!-- TOP STATUS BAR: FULLY RESPONSIVE FOR ALL SCREEN SIZES -->
+  <header class="glass-card border-b border-slate-800/80 px-2 sm:px-6 py-2 flex items-center justify-between shrink-0 z-30 shadow-md gap-1.5 sm:gap-4">
+    
+    <!-- Left: Brand Logo & Title -->
+    <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+      <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-lg sm:text-xl shadow-lg shadow-amber-500/25 cursor-pointer transform hover:rotate-12 transition active:scale-95" onclick="switchTab('clicker')" title="Перейти к Кликеру">
         🍌
       </div>
       <div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs sm:text-sm font-extrabold tracking-wide text-amber-400">GALACTIC BANANA</span>
-          <span class="text-[10px] bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono px-1.5 py-0.5 rounded-full font-bold">v5.0 PRO</span>
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs sm:text-sm font-black tracking-tight sm:tracking-wide text-amber-400 whitespace-nowrap">
+            <span class="inline sm:hidden">G-BANANA</span>
+            <span class="hidden sm:inline">GALACTIC BANANA</span>
+          </span>
+          <span class="hidden sm:inline-block text-[10px] bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono px-1.5 py-0.2 rounded-full font-bold">v5.3</span>
         </div>
-        <div class="text-[11px] text-slate-400 flex items-center gap-2">
+        <div class="hidden sm:flex text-[11px] text-slate-400 items-center gap-2">
           <span>Скины: <b id="headerSkinCount" class="text-slate-200">1/42</b></span>
-          <span class="hidden sm:inline">•</span>
-          <span class="hidden sm:inline">Гарант Эпик: <b id="headerPityEpic" class="text-purple-400">0/25</b></span>
+          <span>•</span>
+          <span>Гарант: <b id="headerPityEpic" class="text-purple-400">0/25</b></span>
         </div>
       </div>
     </div>
 
-    <!-- Right Controls: Settings, Sound, Stats, Prestige -->
-    <div class="flex items-center gap-1.5 sm:gap-2">
-      <div class="hidden md:flex flex-col text-right pr-2 border-r border-slate-800">
-        <span class="text-[10px] text-slate-400 uppercase font-semibold">Бонус Престижа</span>
+    <!-- Center: Balance Display (Optimized for Mobile & Desktop) -->
+    <div class="flex items-center gap-1 sm:gap-2.5 bg-slate-900/90 border border-amber-500/35 px-2 sm:px-3.5 py-1 rounded-xl sm:rounded-2xl shadow-inner cursor-pointer hover:border-amber-400/60 transition group shrink min-w-0" onclick="switchTab('clicker')" title="Баланс бананов (нажмите, чтобы открыть кликер)">
+      <span class="text-xs sm:text-base group-hover:scale-110 transition-transform">🍌</span>
+      <div class="flex flex-col text-left leading-none min-w-0">
+        <span class="hidden xs:block text-[7px] sm:text-[9px] text-slate-400 uppercase font-semibold">Баланс</span>
+        <span id="headerBananasText" class="text-[11px] sm:text-sm font-mono font-black text-amber-300 tracking-tight sm:tracking-wide truncate">0</span>
+      </div>
+      <div class="hidden md:flex flex-col text-left border-l border-slate-800 pl-2 ml-1 leading-tight">
+        <span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-semibold">CPS</span>
+        <span id="headerCpsText" class="text-[11px] font-mono font-bold text-emerald-400">0.0</span>
+      </div>
+    </div>
+
+    <!-- Right Controls: Achievements, Stats, Settings, Sound -->
+    <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+      <div class="hidden lg:flex flex-col text-right pr-2 border-r border-slate-800">
+        <span class="text-[9px] text-slate-400 uppercase font-semibold">Бонус Престижа</span>
         <span id="topPrestigeMultiplier" class="text-xs font-mono font-bold text-emerald-400">+0%</span>
       </div>
 
-      <button onclick="openSettingsModal()" class="p-2 sm:px-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-200 text-sm transition active:scale-95 shadow flex items-center gap-1" title="Настройки и палитры">
-        ⚙️ <span class="hidden sm:inline text-xs font-semibold">Опции</span>
+      <!-- Achievements Button -->
+      <button onclick="openAchievementsModal()" class="p-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-amber-300 text-xs sm:text-sm transition active:scale-95 shadow flex items-center gap-1" title="Достижения">
+        <span>🏆</span> 
+        <span id="topAchievementsBadge" class="text-[10px] sm:text-xs font-mono font-bold">0/19</span>
       </button>
 
-      <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-200 text-sm transition active:scale-95 shadow" title="Включить/Выключить звук">
+      <!-- Stats Button -->
+      <button onclick="openStatsModal()" class="p-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-200 text-xs sm:text-sm transition active:scale-95 shadow flex items-center gap-1" title="Статистика">
+        <span>📊</span> 
+        <span class="hidden sm:inline text-xs font-semibold">Статы</span>
+      </button>
+
+      <!-- Options Button -->
+      <button onclick="openSettingsModal()" class="p-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-200 text-xs sm:text-sm transition active:scale-95 shadow flex items-center gap-1" title="Настройки">
+        <span>⚙️</span> 
+        <span class="hidden sm:inline text-xs font-semibold">Опции</span>
+      </button>
+
+      <!-- Sound Toggle -->
+      <button id="soundToggleBtn" onclick="toggleSound()" class="p-1.5 sm:p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-200 text-xs sm:text-sm transition active:scale-95 shadow" title="Включить/Выключить звук">
         🔊
       </button>
     </div>
   </header>
 
+  <!-- NAVIGATION TABS -->
   <nav class="bg-slate-900/85 border-b border-slate-800/80 px-2 sm:px-6 flex items-center justify-between shrink-0 z-20 overflow-x-auto custom-scroll">
     <div class="flex items-center gap-1 sm:gap-2 w-full max-w-4xl mx-auto">
-      <button onclick="switchTab('clicker')" id="navBtn-clicker" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-amber-400 text-amber-300 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+      <button onclick="switchTab('clicker')" id="navBtn-clicker" class="flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-amber-400 text-amber-300 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
         <span>🍌</span> <span>Кликер</span>
       </button>
 
-      <button onclick="switchTab('inventory')" id="navBtn-inventory" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+      <button onclick="switchTab('inventory')" id="navBtn-inventory" class="flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
         <span>🎒</span> <span>Инвентарь</span>
         <span id="navInventoryCount" class="text-[10px] bg-slate-800 text-amber-300 px-1.5 py-0.5 rounded-full font-mono font-bold">1/42</span>
       </button>
 
-      <button onclick="switchTab('cases')" id="navBtn-cases" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+      <button onclick="switchTab('cases')" id="navBtn-cases" class="flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
         <span>📦</span> <span>Кейсы (14)</span>
       </button>
 
-      <button onclick="switchTab('buildings')" id="navBtn-buildings" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+      <button onclick="switchTab('buildings')" id="navBtn-buildings" class="flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
         <span>🏭</span> <span>Фабрики (12)</span>
       </button>
 
-      <button onclick="switchTab('prestige')" id="navBtn-prestige" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+      <button onclick="switchTab('prestige')" id="navBtn-prestige" class="flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
         <span>👑</span> <span>Престиж</span>
       </button>
 
-      <button onclick="switchTab('secret')" id="navBtn-secret" class="flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+      <button onclick="switchTab('secret')" id="navBtn-secret" class="flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
         <span id="navSecretIcon">🔒</span> <span id="navSecretLabel">Секретно</span>
       </button>
     </div>
   </nav>
 
+  <!-- MAIN SCROLLABLE CONTAINER -->
   <main id="mainContainer" class="flex-1 overflow-y-auto custom-scroll relative p-3 sm:p-6 flex flex-col items-center">
 
-    <!-- FRENZY FLOATING BANNER (ACTIVE ON GOLDEN BANANA TAP) -->
-    <div id="frenzyBanner" class="hidden w-full max-w-xl mb-4 bg-gradient-to-r from-amber-600 via-red-600 to-amber-600 p-3 rounded-2xl shadow-xl shadow-amber-500/20 text-center animate-pulse border border-amber-300/40">
-      <div class="text-xs sm:text-sm font-black uppercase tracking-widest text-yellow-200 flex items-center justify-center gap-2">
+    <!-- FRENZY FLOATING BANNER -->
+    <div id="frenzyBanner" class="hidden w-full max-w-xl mb-3 bg-gradient-to-r from-amber-600 via-red-600 to-amber-600 p-2.5 sm:p-3 rounded-2xl shadow-xl shadow-amber-500/20 text-center animate-pulse border border-amber-300/40">
+      <div class="text-[11px] sm:text-sm font-black uppercase tracking-wider text-yellow-200 flex items-center justify-center gap-2">
         🔥 БАНАНОВОЕ БЕЗУМИЕ (x7 К ВЫРАБОТКЕ) 🔥
       </div>
-      <div id="frenzyTimerText" class="text-[11px] font-mono text-white/90 mt-0.5">Осталось: 15.0с</div>
+      <div id="frenzyTimerText" class="text-[10px] sm:text-[11px] font-mono text-white/90 mt-0.5">Осталось: 15.0с</div>
     </div>
 
     <!-- ==================== TAB 1: CLICKER ==================== -->
-    <div id="view-clicker" class="w-full max-w-2xl flex flex-col items-center justify-between gap-4 py-2 my-auto">
+    <div id="view-clicker" class="w-full max-w-2xl flex flex-col items-center justify-between gap-3 sm:gap-4 py-1 my-auto">
       
-      <!-- Stats Dashboard -->
-      <div class="w-full grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div class="glass-card rounded-2xl p-3 text-center border-amber-500/20 shadow">
-          <div class="text-[10px] text-slate-400 uppercase font-semibold">Бананы на счету</div>
-          <div id="totalBananasText" class="text-base sm:text-xl font-mono font-black text-amber-300 truncate">0</div>
+      <!-- Stats Dashboard Cards -->
+      <div class="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+        <div class="glass-card rounded-2xl p-2.5 sm:p-3 text-center border-amber-500/20 shadow">
+          <div class="text-[9px] sm:text-[10px] text-slate-400 uppercase font-semibold">Бананы на счету</div>
+          <div id="totalBananasText" class="text-sm sm:text-xl font-mono font-black text-amber-300 truncate">0</div>
         </div>
 
-        <div class="glass-card rounded-2xl p-3 text-center border-slate-700/50 shadow">
-          <div class="text-[10px] text-slate-400 uppercase font-semibold">Доход в сек (CPS)</div>
-          <div id="cpsText" class="text-base sm:text-xl font-mono font-black text-emerald-400 truncate">0.0</div>
+        <div class="glass-card rounded-2xl p-2.5 sm:p-3 text-center border-slate-700/50 shadow">
+          <div class="text-[9px] sm:text-[10px] text-slate-400 uppercase font-semibold">Доход в сек (CPS)</div>
+          <div id="cpsText" class="text-sm sm:text-xl font-mono font-black text-emerald-400 truncate">0.0</div>
         </div>
 
-        <div class="glass-card rounded-2xl p-3 text-center border-slate-700/50 shadow">
-          <div class="text-[10px] text-slate-400 uppercase font-semibold">Сила клика (CPC)</div>
-          <div id="cpcText" class="text-base sm:text-xl font-mono font-black text-sky-400 truncate">1</div>
+        <div class="glass-card rounded-2xl p-2.5 sm:p-3 text-center border-slate-700/50 shadow">
+          <div class="text-[9px] sm:text-[10px] text-slate-400 uppercase font-semibold">Сила клика (CPC)</div>
+          <div id="cpcText" class="text-sm sm:text-xl font-mono font-black text-sky-400 truncate">1</div>
         </div>
 
-        <div class="glass-card rounded-2xl p-3 text-center border-slate-700/50 shadow">
-          <div class="text-[10px] text-slate-400 uppercase font-semibold">Шанс крита</div>
-          <div id="critChanceText" class="text-base sm:text-xl font-mono font-black text-pink-400 truncate">5%</div>
+        <div class="glass-card rounded-2xl p-2.5 sm:p-3 text-center border-slate-700/50 shadow">
+          <div class="text-[9px] sm:text-[10px] text-slate-400 uppercase font-semibold">Шанс крита</div>
+          <div id="critChanceText" class="text-sm sm:text-xl font-mono font-black text-pink-400 truncate">5%</div>
         </div>
       </div>
 
-      <div class="relative py-4 sm:py-6 flex flex-col items-center justify-center">
-        <!-- Glow Aura behind Banana -->
-        <div id="bananaGlowAura" class="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-amber-500/15 blur-3xl -z-10 pointer-events-none transition-all duration-300"></div>
+      <!-- Main Clicker Banana -->
+      <div class="relative py-2 sm:py-6 flex flex-col items-center justify-center">
+        <!-- Glow Aura -->
+        <div id="bananaGlowAura" class="absolute w-56 h-56 sm:w-80 sm:h-80 rounded-full bg-amber-500/15 blur-3xl -z-10 pointer-events-none transition-all duration-300"></div>
 
-        <!-- Banana SVG wrapper with interactive listeners -->
+        <!-- Banana Target -->
         <div id="bananaClickTarget" class="cursor-pointer transition-transform duration-75 select-none relative group touch-manipulation active:scale-90" onclick="tapBanana(event)">
-          <div id="bananaSvgContainer" class="w-60 h-60 sm:w-80 sm:h-80 drop-shadow-2xl transition-all duration-300">
+          <div id="bananaSvgContainer" class="w-52 h-52 sm:w-80 sm:h-80 drop-shadow-2xl transition-all duration-300">
             <!-- Dynamic SVG injected here -->
           </div>
         </div>
 
-        <!-- Current Skin Name & Buff -->
-        <div class="mt-3 text-center">
-          <div class="flex items-center justify-center gap-2">
-            <span id="equippedSkinName" class="text-base sm:text-lg font-black text-amber-300 drop-shadow">Классический Банан</span>
-            <span id="equippedSkinBadge" class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-mono">Common</span>
+        <!-- Skin Name & Buff -->
+        <div class="mt-2 text-center">
+          <div class="flex items-center justify-center gap-1.5 sm:gap-2">
+            <span id="equippedSkinName" class="text-sm sm:lg font-black text-amber-300 drop-shadow">Классический Банан</span>
+            <span id="equippedSkinBadge" class="text-[9px] sm:text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-mono">Common</span>
           </div>
-          <p id="equippedSkinBuff" class="text-xs text-slate-400 mt-0.5">Базовый скин (Без бонусов)</p>
+          <p id="equippedSkinBuff" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Базовый скин (Без бонусов)</p>
         </div>
       </div>
 
-      <div class="w-full glass-card rounded-2xl p-3.5 border-slate-800 shadow">
+      <!-- Free Drop Bar -->
+      <div class="w-full glass-card rounded-2xl p-3 sm:p-3.5 border-slate-800 shadow">
         <div class="flex items-center justify-between text-xs mb-1.5">
           <span class="font-semibold text-slate-300 flex items-center gap-1.5">
-            <span>🎁</span> <span>Бесплатный Дроп Скина</span>
+            <span>🎁</span> <span>Бесплатный Дроп</span>
+            <span class="text-[9px] sm:text-[10px] text-amber-400 font-mono font-bold bg-amber-500/10 px-1.5 py-0.5 rounded-md border border-amber-500/20">1% Legendary!</span>
           </span>
-          <span id="freeDropCountText" class="font-mono text-amber-300 font-bold">0 / 750 кликов</span>
+          <span id="freeDropCountText" class="font-mono text-amber-300 font-bold text-[11px] sm:text-xs">0 / 750 кликов</span>
         </div>
-        <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
+        <div class="w-full h-2.5 sm:h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
           <div id="freeDropFill" class="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-emerald-400 rounded-full transition-all duration-200" style="width: 0%"></div>
         </div>
         <div class="mt-2.5 flex justify-end">
@@ -276,20 +317,23 @@
 
     <!-- ==================== TAB 2: INVENTORY ==================== -->
     <div id="view-inventory" class="w-full max-w-4xl hidden flex-col gap-4 py-2">
-      <!-- Inventory Header Controls -->
-      <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow">
+      <!-- Controls -->
+      <div class="glass-card rounded-2xl p-3.5 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow">
         <div>
-          <h2 class="text-lg font-black text-amber-300">Ваша Коллекция Бананов</h2>
+          <h2 class="text-base sm:text-lg font-black text-amber-300">Ваша Коллекция Бананов</h2>
           <p class="text-xs text-slate-400">Надевайте скины для активации баффов или продавайте повторные дубликаты.</p>
         </div>
         <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button onclick="equipBestSkin()" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 text-xs font-black transition flex items-center justify-center gap-1.5 active:scale-95 shadow-md shadow-amber-500/20">
+            <span>⚡</span> <span>Надеть лучшее</span>
+          </button>
           <button onclick="sellAllDuplicates()" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95">
-            <span>💰</span> <span>Продать все дубликаты</span>
+            <span>💰</span> <span>Продать дубликаты</span>
           </button>
         </div>
       </div>
 
-      <!-- Filters Row -->
+      <!-- Filters -->
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scroll">
         <button onclick="filterInventory('all')" class="inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition shadow" data-filter="all">Все (42)</button>
         <button onclick="filterInventory('Common')" class="inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition" data-filter="Common">Common</button>
@@ -299,15 +343,15 @@
         <button onclick="filterInventory('Mythic')" class="inv-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition" data-filter="Mythic">Mythic</button>
       </div>
 
-      <!-- Skins Grid Container -->
+      <!-- Grid -->
       <div id="inventoryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 pb-8">
-        <!-- Injected via JS -->
+        <!-- Rendered via JS -->
       </div>
     </div>
 
     <!-- ==================== TAB 3: CASES ==================== -->
     <div id="view-cases" class="w-full max-w-4xl hidden flex-col gap-4 py-2">
-      <!-- Pity banner -->
+      <!-- Pity Status -->
       <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-amber-500/20 shadow">
         <div>
           <div class="text-sm font-black text-amber-300 flex items-center gap-1.5">
@@ -329,13 +373,13 @@
 
       <!-- Cases Grid -->
       <div id="casesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pb-8">
-        <!-- Injected via JS -->
+        <!-- Rendered via JS -->
       </div>
     </div>
 
     <!-- ==================== TAB 4: BUILDINGS ==================== -->
     <div id="view-buildings" class="w-full max-w-3xl hidden flex-col gap-4 py-2">
-      <!-- Buildings Multiplier Row -->
+      <!-- Multiplier -->
       <div class="glass-card rounded-2xl p-3 flex items-center justify-between gap-3 shadow">
         <span class="text-xs font-bold text-slate-300">Режим покупки фабрик:</span>
         <div class="flex items-center gap-1.5">
@@ -345,9 +389,9 @@
         </div>
       </div>
 
-      <!-- Buildings List -->
+      <!-- List -->
       <div id="buildingsList" class="flex flex-col gap-2.5 pb-8">
-        <!-- Injected via JS -->
+        <!-- Rendered via JS -->
       </div>
     </div>
 
@@ -387,7 +431,7 @@
     <!-- ==================== TAB 6: SECRET MARKET ==================== -->
     <div id="view-secret" class="w-full max-w-3xl hidden flex-col gap-4 py-2">
       
-      <!-- Locked State Banner (When Ascensions === 0) -->
+      <!-- Locked State -->
       <div id="secretLockedState" class="glass-card rounded-3xl p-8 border border-purple-500/30 text-center shadow-2xl my-auto">
         <div class="w-20 h-20 mx-auto rounded-3xl bg-purple-950/70 border border-purple-500/40 flex items-center justify-center text-4xl shadow-lg shadow-purple-500/20 mb-4 animate-pulse">
           🔒
@@ -407,9 +451,8 @@
         </div>
       </div>
 
-      <!-- Unlocked State View -->
+      <!-- Unlocked State -->
       <div id="secretUnlockedState" class="hidden flex-col gap-4">
-        <!-- Market Header -->
         <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border border-purple-500/30 shadow-lg">
           <div>
             <div class="flex items-center gap-2">
@@ -424,7 +467,6 @@
           </div>
         </div>
 
-        <!-- Upgrades List -->
         <div id="secretUpgradesList" class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-8">
           <!-- Populated via JS -->
         </div>
@@ -434,28 +476,25 @@
 
   </main>
 
-
-  <!-- CASE DROP ROULETTE MODAL (CS:GO STYLE HORIZONTAL ROLLER) -->
+  <!-- CASE DROP ROULETTE MODAL -->
   <div id="rouletteModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col items-center justify-center p-4">
     <div class="bg-slate-900 border-2 border-amber-500/40 rounded-3xl max-w-3xl w-full p-6 text-center shadow-2xl relative overflow-hidden">
       
       <h3 class="text-lg font-black text-amber-300 uppercase tracking-widest mb-1">ОТКРЫТИЕ КЕЙСА</h3>
       <p id="rouletteCaseSubtitle" class="text-xs text-slate-400 mb-6">Испытайте удачу в получении редкого банана!</p>
 
-      <!-- Roulette Viewport Container -->
+      <!-- Viewport -->
       <div class="relative w-full h-44 bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-800 shadow-inner my-2">
-        <!-- Center Target Line Indicator -->
         <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-amber-400 shadow-[0_0_15px_#f59e0b] z-20 pointer-events-none"></div>
         <div class="absolute top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-amber-400 z-20 pointer-events-none"></div>
         <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-amber-400 z-20 pointer-events-none"></div>
 
-        <!-- Moving Strip Track -->
         <div id="rouletteTrack" class="flex items-center h-full absolute left-0 top-0 transition-transform will-change-transform">
-          <!-- 45 Skin Cards dynamically populated -->
+          <!-- Cards populated dynamically -->
         </div>
       </div>
 
-      <!-- Winner Reveal Box (Shown after stop) -->
+      <!-- Winner Reveal Card -->
       <div id="rouletteWinnerCard" class="hidden flex-col items-center mt-5 p-4 rounded-2xl bg-slate-950/90 border border-amber-500/30 animate-bounce-click">
         <div class="text-xs uppercase font-extrabold text-amber-400 tracking-wider mb-2">ВАШ ВЫИГРЫШ:</div>
         <div id="rouletteWinSvg" class="w-24 h-24 my-1"></div>
@@ -473,7 +512,6 @@
         </div>
       </div>
 
-      <!-- Close button when spinning is done -->
       <button id="rouletteCloseBtn" onclick="closeRouletteModal()" class="hidden mt-4 text-xs font-bold text-slate-400 hover:text-slate-200 py-2 px-4 rounded-xl">
         Закрыть
       </button>
@@ -492,15 +530,13 @@
         <button onclick="closeCaseInfoModal()" class="text-slate-400 hover:text-slate-200 text-lg p-1.5 rounded-lg">✕</button>
       </div>
 
-      <!-- Probability Rates -->
       <div class="my-3 p-3 bg-slate-950/70 rounded-xl border border-slate-800/80">
         <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Шансы дропа редкостей:</div>
         <div id="caseInfoRates" class="grid grid-cols-2 gap-2 text-xs font-mono">
-          <!-- Populated via JS -->
+          <!-- Rates populated via JS -->
         </div>
       </div>
 
-      <!-- Skins Pool in this Case -->
       <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Возможные скины:</div>
       <div id="caseInfoContent" class="max-h-56 overflow-y-auto custom-scroll space-y-1.5 pr-1">
         <!-- List injected via JS -->
@@ -512,7 +548,7 @@
     </div>
   </div>
 
-  <!-- UNIVERSAL CONFIRMATION MODAL -->
+  <!-- CONFIRMATION MODAL -->
   <div id="confirmModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 text-center shadow-2xl">
       <div class="text-3xl mb-2">⚠️</div>
@@ -534,7 +570,6 @@
       </div>
 
       <div class="py-4 space-y-4 text-xs">
-        <!-- Visual Theme Selection -->
         <div>
           <label class="block font-bold text-slate-300 mb-1.5">Тема оформления игры:</label>
           <select id="themeSelect" onchange="changeTheme(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400 font-semibold">
@@ -546,7 +581,6 @@
           </select>
         </div>
 
-        <!-- Audio Volume Range -->
         <div>
           <div class="flex justify-between items-center mb-1.5">
             <label class="font-bold text-slate-300">Громкость звуковых эффектов:</label>
@@ -555,7 +589,6 @@
           <input type="range" id="volumeRange" min="0" max="100" value="100" oninput="updateVolume(this.value)" class="w-full accent-amber-500 bg-slate-800 rounded-lg cursor-pointer">
         </div>
 
-        <!-- Visual Effects Toggles -->
         <div class="space-y-2 pt-2 border-t border-slate-800">
           <label class="block font-bold text-slate-300">Визуальные эффекты:</label>
           <div class="flex items-center justify-between p-2 bg-slate-950/60 rounded-xl">
@@ -572,7 +605,17 @@
           </div>
         </div>
 
-        <!-- Export / Import Save Data -->
+        <div class="space-y-2 pt-2 border-t border-slate-800">
+          <label class="block font-bold text-slate-300">🎁 Промокоды (Promo Codes):</label>
+          <div class="flex gap-1.5">
+            <input type="text" id="promoCodeInput" placeholder="Введите код (например, release)" class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 uppercase tracking-wider font-mono focus:outline-none focus:border-amber-400">
+            <button onclick="redeemPromoCode()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 rounded-xl text-xs font-black uppercase tracking-wider transition active:scale-95 shadow">
+              Ввод
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-400">Вводятся только на английском языке (регистр не имеет значения).</p>
+        </div>
+
         <div class="space-y-2 pt-2 border-t border-slate-800">
           <label class="block font-bold text-slate-300">Управление сохранением:</label>
           <div class="flex gap-2">
@@ -595,6 +638,58 @@
     </div>
   </div>
 
+  <!-- ACHIEVEMENTS MODAL -->
+  <div id="achievementsModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-5 text-left shadow-2xl max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🏆</span>
+            <h3 class="text-base font-extrabold text-amber-300">Достижения Галактики</h3>
+          </div>
+          <p id="achievementsSummarySubtitle" class="text-xs text-slate-400 mt-0.5">Разблокировано: 0 из 19</p>
+        </div>
+        <button onclick="closeAchievementsModal()" class="text-slate-400 hover:text-slate-200 text-lg p-1.5 rounded-lg">✕</button>
+      </div>
+
+      <div id="achievementsList" class="my-3 overflow-y-auto custom-scroll space-y-2 pr-1 flex-1">
+        <!-- Rendered via JS -->
+      </div>
+
+      <button onclick="closeAchievementsModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition shrink-0">
+        Закрыть
+      </button>
+    </div>
+  </div>
+
+  <!-- STATS DASHBOARD MODAL -->
+  <div id="statsModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-5 text-left shadow-2xl max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📊</span>
+          <div>
+            <h3 class="text-base font-extrabold text-amber-300">Статистика Империи</h3>
+            <span id="statsLastUpdatedText" class="text-[10px] text-slate-400 font-mono">Обновлено: только что</span>
+          </div>
+        </div>
+        <button onclick="closeStatsModal()" class="text-slate-400 hover:text-slate-200 text-lg p-1.5 rounded-lg">✕</button>
+      </div>
+
+      <div id="statsModalContent" class="my-3 overflow-y-auto custom-scroll space-y-2 pr-1 flex-1 text-xs">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div class="mt-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-[11px] text-center font-medium shrink-0 leading-relaxed">
+        ⚠️ Обратите внимание: статистика обновляется раз в минуту для максимальной производительности игры.
+      </div>
+
+      <button onclick="closeStatsModal()" class="w-full mt-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition shrink-0">
+        Закрыть
+      </button>
+    </div>
+  </div>
+
   <!-- IMPORT CODE INPUT MODAL -->
   <div id="saveInputModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 text-left shadow-2xl">
@@ -613,7 +708,7 @@
 
   <script>
     /* =====================================================================
-       AUDIO SYNTHESIZER (WEB AUDIO API - NO EXTERNAL AUDIO DEPENDENCIES)
+       AUDIO SYNTHESIZER (WEB AUDIO API)
        ===================================================================== */
     let audioCtx = null;
     function getAudioContext() {
@@ -648,9 +743,7 @@
 
         osc.start();
         osc.stop(ctx.currentTime + duration);
-      } catch (e) {
-        // Audio error fallback
-      }
+      } catch (e) {}
     }
 
     function playPopSfx() {
@@ -679,7 +772,7 @@
     }
 
     /* =====================================================================
-       SKINS DATABASE (42 UNIQUE BANANAS ACROSS 5 RARITY TIERS)
+       SKINS DATABASE (42 UNIQUE BANANAS)
        ===================================================================== */
     const SKINS = [
       {
@@ -1231,7 +1324,7 @@
     ];
 
     /* =====================================================================
-       CASES CATALOG (14 BALANCED CASES FOR ALL GAME STAGES)
+       CASES CATALOG (14 CASES)
        ===================================================================== */
     const CASES = [
       {
@@ -1363,7 +1456,7 @@
     ];
 
     /* =====================================================================
-       BUILDINGS DATA (12 AUTOMATIC FACTORIES - PACKING PLANT IS 1M)
+       BUILDINGS DATA (12 FACTORIES)
        ===================================================================== */
     const BUILDINGS = [
       {
@@ -1407,7 +1500,7 @@
         name: 'Фасовочный Цех',
         icon: '🏭',
         desc: 'Промышленный гигант по упаковке миллионов бананов в день.',
-        baseCost: 1000000, // Exactly 1,000,000 as requested!
+        baseCost: 1000000,
         baseCps: 260.0,
         count: 0
       },
@@ -1477,7 +1570,7 @@
     ];
 
     /* =====================================================================
-       PLAYER STATE & LOCALSTORAGE PERSISTENCE
+       PLAYER STATE
        ===================================================================== */
     let state = {
       bananas: 0,
@@ -1496,13 +1589,46 @@
       pityEpic: 0,
       pityLegendary: 0,
       lastSaveTime: Date.now(),
-      pendingOfflineBananas: 0,
+      unlockedAchievements: [],
+      redeemedCodes: [],
       settings: {
         theme: 'default',
         volume: 100,
         floatingFx: true,
         particlesFx: true,
         glowFx: true
+      }
+    };
+
+    const ACHIEVEMENTS = [
+      { id: 'first_click', title: 'Первый росток', desc: 'Сделать 1 клик по банану', icon: '🍌', check: () => state.totalClicks >= 1, rewardText: '+1% к клику' },
+      { id: 'clicks_100', title: 'Разминка пальцев', desc: 'Сделать 100 кликов', icon: '👆', check: () => state.totalClicks >= 100, rewardText: '+2% к клику' },
+      { id: 'clicks_1000', title: 'Кликер-фанат', desc: 'Сделать 1,000 кликов', icon: '⚡', check: () => state.totalClicks >= 1000, rewardText: '+3% к клику' },
+      { id: 'clicks_10000', title: 'Квантовый палец', desc: 'Сделать 10,000 кликов', icon: '🦾', check: () => state.totalClicks >= 10000, rewardText: '+5% к клику' },
+      { id: 'bananas_1k', title: 'Банановый фермер', desc: 'Собрать 1,000 бананов за всю историю', icon: '🧺', check: () => state.allTimeBananas >= 1000, rewardText: '+1% к CPS' },
+      { id: 'bananas_1m', title: 'Банановый миллионер', desc: 'Собрать 1,000,000 бананов за всю историю', icon: '💰', check: () => state.allTimeBananas >= 1000000, rewardText: '+2% к CPS' },
+      { id: 'bananas_1b', title: 'Банановый магнат', desc: 'Собрать 1,000,000,000 бананов за всю историю', icon: '💎', check: () => state.allTimeBananas >= 1000000000, rewardText: '+3% к CPS' },
+      { id: 'bananas_1t', title: 'Космический олигарх', desc: 'Собрать 1,000,000,000,000 бананов за всю историю', icon: '👑', check: () => state.allTimeBananas >= 1000000000000, rewardText: '+5% ко всему доходу' },
+      { id: 'bananas_1q', title: 'Повелитель сингулярности', desc: 'Собрать 1 квадриллион бананов (1Q)', icon: '🌌', check: () => state.allTimeBananas >= 1e15, rewardText: '+10% ко всему доходу' },
+      { id: 'first_case', title: 'Азартный новичок', desc: 'Открыть хотя бы 1 кейс', icon: '📦', check: () => state.casesOpened >= 1, rewardText: '+2% к клику' },
+      { id: 'cases_25', title: 'Охотник за дропом', desc: 'Открыть 25 кейсов', icon: '🎁', check: () => state.casesOpened >= 25, rewardText: '+2% шанс крита' },
+      { id: 'cases_100', title: 'Кейс-мастер', desc: 'Открыть 100 кейсов', icon: '🎰', check: () => state.casesOpened >= 100, rewardText: '+5% ко всему доходу' },
+      { id: 'golden_1', title: 'Удачный день', desc: 'Поймать 1 Золотой Банан', icon: '🌟', check: () => state.goldenClicks >= 1, rewardText: '+2% к клику' },
+      { id: 'golden_10', title: 'Ловец комет', desc: 'Поймать 10 Золотых Бананов', icon: '☄️', check: () => state.goldenClicks >= 10, rewardText: '+5% к шансу крита' },
+      { id: 'skins_5', title: 'Любитель моды', desc: 'Собрать 5 уникальных скинов в инвентаре', icon: '🎒', check: () => Object.keys(state.inventory).length >= 5, rewardText: '+2% к клику' },
+      { id: 'skins_20', title: 'Премиум коллекционер', desc: 'Собрать 20 уникальных скинов', icon: '🎨', check: () => Object.keys(state.inventory).length >= 20, rewardText: '+5% ко всему доходу' },
+      { id: 'skins_35', title: 'Хранитель музея', desc: 'Собрать 35 уникальных скинов', icon: '🏛️', check: () => Object.keys(state.inventory).length >= 35, rewardText: '+10% ко всему доходу' },
+      { id: 'prestige_1', title: 'Первая реинкарнация', desc: 'Совершить хотя бы 1 Престиж', icon: '👑', check: () => state.ascensions >= 1, rewardText: '+1 Золотая Кожурка' },
+      { id: 'factory_packing', title: 'Индустриализация', desc: 'Купить хотя бы 1 Фасовочный Цех', icon: '🏭', check: () => (BUILDINGS.find(b => b.id === 'b_factory')?.count || 0) >= 1, rewardText: '+3% к CPS' }
+    ];
+
+    const PROMO_CODES = {
+      'release': {
+        rewardText: '+10,000 бананов',
+        apply: () => {
+          state.bananas += 10000;
+          state.allTimeBananas += 10000;
+        }
       }
     };
 
@@ -1613,28 +1739,56 @@
     setInterval(saveGame, 5000);
 
     /* =====================================================================
-       MATH, CPC & CPS CALCULATIONS
+       CORE CALCULATIONS
        ===================================================================== */
     function getEquippedSkin() {
       return SKINS.find(s => s.id === state.equippedSkinId) || SKINS[0];
     }
 
     function getPrestigeMultiplier() {
-      // 20% bonus per peel earned over lifetime (including spent ones!)
       const totalEarnedPeels = (state.prestigePeels || 0) + (state.spentPeels || 0);
       let baseMult = 1 + (totalEarnedPeels * 0.20);
-      
-      // Secret market overdrive upgrade (+50% per level)
       const overdriveLvl = state.secretUpgrades['upg_overdrive'] || 0;
       baseMult *= (1 + (overdriveLvl * 0.50));
       return baseMult;
+    }
+
+    function getAchievementClickBonus() {
+      if (!state.unlockedAchievements) return 0;
+      let bonus = 0;
+      if (state.unlockedAchievements.includes('first_click')) bonus += 0.01;
+      if (state.unlockedAchievements.includes('clicks_100')) bonus += 0.02;
+      if (state.unlockedAchievements.includes('clicks_1000')) bonus += 0.03;
+      if (state.unlockedAchievements.includes('clicks_10000')) bonus += 0.05;
+      if (state.unlockedAchievements.includes('first_case')) bonus += 0.02;
+      if (state.unlockedAchievements.includes('golden_1')) bonus += 0.02;
+      if (state.unlockedAchievements.includes('skins_5')) bonus += 0.02;
+      if (state.unlockedAchievements.includes('bananas_1t')) bonus += 0.05;
+      if (state.unlockedAchievements.includes('bananas_1q')) bonus += 0.10;
+      return bonus;
+    }
+
+    function getAchievementCpsBonus() {
+      if (!state.unlockedAchievements) return 0;
+      let bonus = 0;
+      if (state.unlockedAchievements.includes('bananas_1k')) bonus += 0.01;
+      if (state.unlockedAchievements.includes('bananas_1m')) bonus += 0.02;
+      if (state.unlockedAchievements.includes('bananas_1b')) bonus += 0.03;
+      if (state.unlockedAchievements.includes('factory_packing')) bonus += 0.03;
+      if (state.unlockedAchievements.includes('cases_100')) bonus += 0.05;
+      if (state.unlockedAchievements.includes('skins_20')) bonus += 0.05;
+      if (state.unlockedAchievements.includes('skins_35')) bonus += 0.10;
+      if (state.unlockedAchievements.includes('bananas_1t')) bonus += 0.05;
+      if (state.unlockedAchievements.includes('bananas_1q')) bonus += 0.10;
+      return bonus;
     }
 
     function calculateCpc() {
       const skin = getEquippedSkin();
       const prestigeMult = getPrestigeMultiplier();
       const frenzy = frenzyActive ? 7 : 1;
-      let power = 1 * skin.cpcMult * prestigeMult * frenzy;
+      const achBonus = 1 + getAchievementClickBonus();
+      const power = 1 * skin.cpcMult * prestigeMult * frenzy * achBonus;
       return Math.max(1, Math.round(power));
     }
 
@@ -1644,7 +1798,8 @@
       const skin = getEquippedSkin();
       const prestigeMult = getPrestigeMultiplier();
       const frenzy = frenzyActive ? 7 : 1;
-      return raw * skin.cpsMult * prestigeMult * frenzy;
+      const achBonus = 1 + getAchievementCpsBonus();
+      return raw * skin.cpsMult * prestigeMult * frenzy * achBonus;
     }
 
     function formatNumber(val) {
@@ -1670,211 +1825,439 @@
     }
 
     /* =====================================================================
-       PROCEDURAL STEAM-LIKE BANANA SVG RENDERER
+       PROCEDURAL VECTOR SVG BANANA RENDERER
        ===================================================================== */
-    function renderBananaSvg(skin, width = '100%', height = '100%', uniquePrefix = 'b') {
-      const c = skin.colors;
-      const gradId = `${uniquePrefix}_grad_${skin.id}`;
+    function renderBananaSvg(skin, w = '100%', h = '100%', prefix = 'b') {
+      const s = skin || SKINS[0];
+      const c = s.colors || { stop1: '#FFE600', stop2: '#FFCC00', stop3: '#E6A800', stroke: '#B8860B', stem: '#556B2F', tip: '#3E2723' };
+      const gradId = `${prefix}_grad_${s.id}`;
+      const glowId = `${prefix}_glow_${s.id}`;
 
       return `
-        <svg viewBox="0 0 200 340" width="${width}" height="${height}" class="overflow-visible select-none pointer-events-none drop-shadow-xl" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 200 200" width="${w}" height="${h}" class="transition-transform duration-150 filter drop-shadow-md overflow-visible select-none pointer-events-none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="${c.stop1}" />
               <stop offset="50%" stop-color="${c.stop2}" />
               <stop offset="100%" stop-color="${c.stop3}" />
             </linearGradient>
-            <filter id="${uniquePrefix}_softglow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="${c.stroke}" flood-opacity="0.35"/>
+            <filter id="${glowId}" x="-25%" y="-25%" width="150%" height="150%">
+              <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="${c.stroke}" flood-opacity="0.4"/>
             </filter>
           </defs>
-
-          <!-- Main Curved Banana Silhouette (Faithful to Steam Banana anatomy) -->
-          <path d="M 45,35 
-                   C 80,30 120,45 152,80 
-                   C 182,118 190,175 174,225 
-                   C 160,265 125,302 78,324 
-                   C 68,328 60,320 63,310 
-                   C 88,268 114,220 114,162 
-                   C 114,115 88,68 42,46 
-                   C 36,43 38,36 45,35 Z"
-                fill="url(#${gradId})" 
-                stroke="${c.stroke}" 
-                stroke-width="3"
-                stroke-linejoin="round"
-                filter="url(#${uniquePrefix}_softglow)" />
-
-          <!-- Back Ridge Shadow Line -->
-          <path d="M 48,36 
-                   C 82,34 122,50 152,85 
-                   C 180,122 188,176 172,224"
-                fill="none" 
-                stroke="rgba(0,0,0,0.18)" 
-                stroke-width="4" 
-                stroke-linecap="round" />
-
-          <!-- Front Center Highlight Rib -->
-          <path d="M 52,48 
-                   C 88,58 126,98 132,156 
-                   C 137,212 116,255 80,300" 
-                fill="none" 
-                stroke="rgba(255,255,255,0.45)" 
-                stroke-width="5" 
-                stroke-linecap="round" />
-
-          <!-- Authentic Stem at top -->
-          <path d="M 43,36 
-                   C 40,24 35,14 30,8 
-                   C 36,7 44,9 47,15 
-                   C 49,22 49,30 46,36 Z" 
-                fill="${c.stem}" 
-                stroke="rgba(0,0,0,0.25)" 
-                stroke-width="1.5" />
-
-          <!-- Bottom Tip -->
-          <ellipse cx="68" cy="318" rx="6.5" ry="4.5" 
-                   transform="rotate(-25 68 318)" 
-                   fill="${c.tip}" />
+          <path d="M 42,28 C 70,22 135,45 160,110 C 172,142 152,175 142,180 C 148,155 140,120 115,85 C 88,48 55,34 42,28 Z" 
+                fill="url(#${gradId})" stroke="${c.stroke}" stroke-width="3.5" stroke-linejoin="round" filter="url(#${glowId})"/>
+          <path d="M 45,30 C 75,32 130,65 148,125 C 152,145 142,175 142,175" 
+                fill="none" stroke="${c.stroke}" stroke-width="2.5" opacity="0.6"/>
+          <path d="M 43,29 C 70,24 133,48 156,108 C 145,75 110,48 45,30 Z" 
+                fill="white" opacity="0.22"/>
+          <path d="M 45,30 C 90,55 130,95 142,175 C 132,148 115,108 85,75 C 62,50 48,34 45,30 Z" 
+                fill="${c.stop3}" opacity="0.32"/>
+          <path d="M 43,29 C 38,22 30,16 22,14 C 23,19 32,25 40,31 Z" 
+                fill="${c.stem}" stroke="${c.stem}" stroke-width="1.8" stroke-linejoin="round"/>
+          <ellipse cx="22" cy="14" rx="3.5" ry="2" fill="#3f4818" transform="rotate(-15 22 14)"/>
+          <path d="M 142,180 C 146,186 150,190 153,193 C 149,188 145,183 140,178 Z" 
+                fill="${c.tip}" stroke="${c.tip}" stroke-width="2"/>
         </svg>
       `;
     }
 
     function applySkinToBanana(skinId) {
-      const skin = SKINS.find(s => s.id === skinId) || SKINS[0];
-      state.equippedSkinId = skin.id;
+      state.equippedSkinId = skinId;
+      const skin = getEquippedSkin();
 
       const container = document.getElementById('bananaSvgContainer');
-      container.innerHTML = renderBananaSvg(skin, '100%', '100%', 'main');
+      if (container) {
+        container.innerHTML = renderBananaSvg(skin, '100%', '100%', 'main_banana');
+      }
 
-      document.getElementById('equippedSkinName').innerText = skin.name;
-      document.getElementById('equippedSkinBuff').innerText = skin.buffDesc;
-      
-      const badge = document.getElementById('equippedSkinBadge');
-      badge.innerText = skin.rarity;
-      badge.className = `text-[10px] uppercase font-bold px-2 py-0.5 rounded-full font-mono ${getRarityBadgeClass(skin.rarity)}`;
+      const nameEl = document.getElementById('equippedSkinName');
+      if (nameEl) nameEl.innerText = skin.name;
+
+      const badgeEl = document.getElementById('equippedSkinBadge');
+      if (badgeEl) {
+        badgeEl.innerText = skin.rarity;
+        badgeEl.className = `text-[9px] sm:text-[10px] uppercase font-bold px-2 py-0.5 rounded-full font-mono ${getRarityBadgeClass(skin.rarity)}`;
+      }
+
+      const buffEl = document.getElementById('equippedSkinBuff');
+      if (buffEl) buffEl.innerText = skin.buffDesc;
 
       const aura = document.getElementById('bananaGlowAura');
-      aura.style.backgroundColor = skin.colors.stop1;
-      aura.style.opacity = state.settings.glowFx ? '0.22' : '0';
-    }
+      if (aura) {
+        if (state.settings.glowFx) {
+          aura.style.background = skin.colors.stop1;
+          aura.style.opacity = '0.25';
+        } else {
+          aura.style.opacity = '0';
+        }
+      }
 
-    function getRarityBadgeClass(rarity) {
-      switch (rarity) {
-        case 'Common': return 'bg-slate-800 text-slate-300 border border-slate-700';
-        case 'Rare': return 'bg-sky-500/15 text-sky-300 border border-sky-500/30';
-        case 'Epic': return 'bg-purple-500/15 text-purple-300 border border-purple-500/30';
-        case 'Legendary': return 'bg-amber-500/15 text-amber-300 border border-amber-500/30';
-        case 'Mythic': return 'bg-rose-500/15 text-rose-300 border border-rose-500/30';
-        default: return 'bg-slate-800 text-slate-300';
+      const target = document.getElementById('bananaClickTarget');
+      if (target) {
+        if (state.settings.floatingFx) {
+          target.classList.add('animate-float-slow');
+        } else {
+          target.classList.remove('animate-float-slow');
+        }
       }
     }
 
     function getRarityBorderClass(rarity) {
       switch (rarity) {
-        case 'Common': return 'border-slate-700/60 hover:border-slate-500';
-        case 'Rare': return 'border-sky-500/30 hover:border-sky-400';
-        case 'Epic': return 'border-purple-500/30 hover:border-purple-400';
-        case 'Legendary': return 'border-amber-500/40 hover:border-amber-400';
-        case 'Mythic': return 'border-rose-500/50 hover:border-rose-400';
-        default: return 'border-slate-800';
+        case 'Common': return 'border-slate-600/70 hover:border-slate-400';
+        case 'Rare': return 'border-sky-500/60 hover:border-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.2)]';
+        case 'Epic': return 'border-purple-500/70 hover:border-purple-400 shadow-[0_0_12px_rgba(192,132,252,0.25)]';
+        case 'Legendary': return 'border-amber-400/80 hover:border-yellow-300 shadow-[0_0_15px_rgba(251,191,36,0.3)]';
+        case 'Mythic': return 'border-rose-500 hover:border-pink-400 shadow-[0_0_18px_rgba(244,63,94,0.35)]';
+        default: return 'border-slate-700';
       }
     }
 
-    /* =====================================================================
-       CLICKER TAP LOGIC, FLOATING PARTICLES & FREE DROP BAR
-       ===================================================================== */
-    function tapBanana(e) {
+    function getRarityBadgeClass(rarity) {
+      switch (rarity) {
+        case 'Common': return 'bg-slate-700/80 text-slate-300 border border-slate-600';
+        case 'Rare': return 'bg-sky-500/20 text-sky-300 border border-sky-500/40';
+        case 'Epic': return 'bg-purple-500/20 text-purple-300 border border-purple-500/40';
+        case 'Legendary': return 'bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        case 'Mythic': return 'bg-rose-500/20 text-rose-300 border border-rose-500/40';
+        default: return 'bg-slate-800 text-slate-400';
+      }
+    }
+
+    function tapBanana(event) {
       state.totalClicks++;
+
       const skin = getEquippedSkin();
       const cpc = calculateCpc();
-
+      
+      const megaCritLvl = state.secretUpgrades['upg_mega_crit'] || 0;
+      const critMultiplier = megaCritLvl > 0 ? 6.0 : (skin.id === 'ruby' ? 4.0 : (skin.id === 'cyber_samurai' ? 5.0 : (skin.id === 'supernova' ? 6.0 : 3.5)));
+      
       const isCrit = Math.random() < skin.critChance;
-      const critMultiplier = (state.secretUpgrades['upg_mega_crit'] || 0) > 0 ? 6.0 : 3.5;
-      const gain = isCrit ? Math.round(cpc * critMultiplier) : cpc;
+      const clickValue = isCrit ? Math.round(cpc * critMultiplier) : cpc;
 
-      state.bananas += gain;
-      state.allTimeBananas += gain;
+      state.bananas += clickValue;
+      state.allTimeBananas += clickValue;
 
-      // Check drop target with secret upgrade
-      const targetTaps = (state.secretUpgrades['upg_drop_rush'] || 0) > 0 ? 350 : 750;
-      state.freeDropTapsTarget = targetTaps;
-
-      // Progress free drop
-      if (state.freeDropTapsCurrent < state.freeDropTapsTarget) {
-        state.freeDropTapsCurrent++;
-        updateFreeDropBar();
-      }
-
-      // Sounds
       if (isCrit) {
         playCritSfx();
       } else {
         playPopSfx();
       }
 
-      // Visual punch bounce
       const target = document.getElementById('bananaClickTarget');
-      target.classList.remove('animate-bounce-click');
-      void target.offsetWidth;
-      target.classList.add('animate-bounce-click');
+      if (target) {
+        target.classList.remove('animate-bounce-click');
+        void target.offsetWidth;
+        target.classList.add('animate-bounce-click');
+      }
 
-      // Floating number particle
-      if (state.settings.particlesFx) {
-        const clientX = e ? e.clientX : undefined;
-        const clientY = e ? e.clientY : undefined;
-        spawnFloatingNumber(clientX, clientY, gain, isCrit);
+      if (state.settings.particlesFx && event) {
+        spawnClickParticle(event, clickValue, isCrit);
+      }
+
+      incrementFreeDrop();
+
+      if (state.totalClicks % 10 === 0) {
+        checkAchievements();
       }
 
       updateUI();
     }
 
-    function spawnFloatingNumber(x, y, amount, isCrit) {
+    function spawnClickParticle(event, value, isCrit) {
       const el = document.createElement('div');
-      el.className = `floating-banana-text font-mono ${isCrit ? 'text-amber-300 text-xl font-black drop-shadow-[0_0_8px_#f59e0b]' : 'text-slate-100 text-sm'}`;
-      el.innerText = `${isCrit ? '💥 CRIT! +' : '+'}${formatNumber(amount)}`;
+      el.className = 'floating-banana-text select-none';
       
-      const offsetX = (Math.random() - 0.5) * 35;
-      const offsetY = (Math.random() - 0.5) * 20;
+      let clientX = event.clientX;
+      let clientY = event.clientY;
+      if (!clientX && !clientY && event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+      }
+      if (!clientX || !clientY) {
+        const rect = document.getElementById('bananaClickTarget')?.getBoundingClientRect();
+        if (rect) {
+          clientX = rect.left + rect.width / 2;
+          clientY = rect.top + rect.height / 2;
+        } else {
+          clientX = window.innerWidth / 2;
+          clientY = window.innerHeight / 2;
+        }
+      }
 
-      el.style.left = `${(x || window.innerWidth / 2) + offsetX}px`;
-      el.style.top = `${(y || window.innerHeight / 2) + offsetY}px`;
+      el.style.left = `${clientX + (Math.random() - 0.5) * 40}px`;
+      el.style.top = `${clientY + (Math.random() - 0.5) * 30}px`;
+
+      if (isCrit) {
+        el.innerHTML = `💥 +${formatNumber(value)}!`;
+        el.className += ' text-amber-300 text-base sm:text-xl drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]';
+      } else {
+        el.innerHTML = `+${formatNumber(value)}`;
+        el.className += ' text-white text-xs sm:text-base drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]';
+      }
 
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 900);
+      setTimeout(() => el.remove(), 850);
+    }
+
+    function getFreeDropTarget() {
+      const rushLvl = state.secretUpgrades['upg_drop_rush'] || 0;
+      return rushLvl > 0 ? 350 : 750;
+    }
+
+    function incrementFreeDrop() {
+      state.freeDropTapsCurrent++;
+      updateFreeDropBar();
     }
 
     function updateFreeDropBar() {
-      const cur = state.freeDropTapsCurrent;
-      const tar = state.freeDropTapsTarget;
-      const pct = Math.min(100, (cur / tar) * 100);
+      const target = getFreeDropTarget();
+      state.freeDropTapsTarget = target;
+      const current = state.freeDropTapsCurrent || 0;
+      const pct = Math.min(100, (current / target) * 100);
 
-      document.getElementById('freeDropFill').style.width = `${pct}%`;
-      document.getElementById('freeDropCountText').innerText = `${cur} / ${tar} кликов`;
+      const fill = document.getElementById('freeDropFill');
+      if (fill) fill.style.width = `${pct}%`;
+
+      const text = document.getElementById('freeDropCountText');
+      if (text) text.innerText = `${current} / ${target} кликов`;
 
       const btn = document.getElementById('freeDropBtn');
-      if (cur >= tar) {
-        btn.removeAttribute('disabled');
-        btn.className = "w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 animate-pulse shadow-lg shadow-amber-500/25 active:scale-95 cursor-pointer";
-        btn.innerHTML = `<span>Забрать Скин!</span> <span>🎁</span>`;
-      } else {
-        btn.setAttribute('disabled', 'true');
-        btn.className = "w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-800 text-slate-500 cursor-not-allowed shadow";
-        btn.innerHTML = `<span>Забрать Дроп</span> <span>🎁</span>`;
+      if (btn) {
+        if (current >= target) {
+          btn.disabled = false;
+          btn.className = "w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 cursor-pointer shadow-lg shadow-amber-500/25 active:scale-95 transition flex items-center justify-center gap-1.5";
+        } else {
+          btn.disabled = true;
+          btn.className = "w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-800 text-slate-500 cursor-not-allowed transition flex items-center justify-center gap-1.5 shadow";
+        }
       }
     }
 
     function claimFreeDrop() {
-      if (state.freeDropTapsCurrent < state.freeDropTapsTarget) return;
+      const target = getFreeDropTarget();
+      if ((state.freeDropTapsCurrent || 0) < target) return;
+
       state.freeDropTapsCurrent = 0;
       updateFreeDropBar();
 
-      // Free Drop has Harvest case odds
-      const chosenCase = CASES[0];
-      startRouletteSpin(chosenCase, true);
+      // Free Drop with 1% Legendary Golden chance
+      const freeDropCase = {
+        id: 'case_freedrop',
+        name: 'Бесплатный Дроп',
+        cost: 0,
+        icon: '🎁',
+        desc: 'Награда за клики! 1% шанс на Золотой 24 Карата (Legendary).',
+        pool: ['classic', 'spotted', 'green', 'pixel', 'chocolate', 'golden'],
+        rates: { Common: 79, Rare: 20, Epic: 0, Legendary: 1, Mythic: 0 }
+      };
+
+      startRouletteSpin(freeDropCase, true);
     }
 
     /* =====================================================================
-       CASES CATALOG & OPENING WITH SECRET DISCOUNTS
+       ACHIEVEMENTS SYSTEM
+       ===================================================================== */
+    function checkAchievements() {
+      if (!state.unlockedAchievements) state.unlockedAchievements = [];
+      let newUnlock = false;
+
+      ACHIEVEMENTS.forEach(ach => {
+        if (!state.unlockedAchievements.includes(ach.id)) {
+          if (ach.check()) {
+            state.unlockedAchievements.push(ach.id);
+            newUnlock = true;
+            playWinSfx();
+            showToast(`Достижение: ${ach.title}! (${ach.rewardText})`, '🏆');
+          }
+        }
+      });
+
+      if (newUnlock) {
+        updateAchievementsBadge();
+        saveGame();
+      }
+    }
+
+    function updateAchievementsBadge() {
+      const count = (state.unlockedAchievements || []).length;
+      const el = document.getElementById('topAchievementsBadge');
+      if (el) el.innerText = `${count}/${ACHIEVEMENTS.length}`;
+    }
+
+    function openAchievementsModal() {
+      checkAchievements();
+      const list = document.getElementById('achievementsList');
+      list.innerHTML = '';
+
+      const unlocked = state.unlockedAchievements || [];
+      document.getElementById('achievementsSummarySubtitle').innerText = `Разблокировано: ${unlocked.length} из ${ACHIEVEMENTS.length}`;
+
+      ACHIEVEMENTS.forEach(ach => {
+        const isDone = unlocked.includes(ach.id);
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-2xl border flex items-center justify-between gap-3 ${isDone ? 'bg-amber-500/10 border-amber-500/40' : 'bg-slate-950/60 border-slate-800/80 opacity-60'}`;
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl ${isDone ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-500'} flex items-center justify-center text-xl shrink-0">
+              ${ach.icon}
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="text-xs font-black ${isDone ? 'text-amber-300' : 'text-slate-300'}">${ach.title}</h4>
+                ${isDone ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded-full font-bold">Выполнено</span>' : ''}
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5">${ach.desc}</p>
+              <div class="text-[10px] font-mono ${isDone ? 'text-emerald-400' : 'text-slate-500'} mt-0.5">Награда: ${ach.rewardText}</div>
+            </div>
+          </div>
+          <div class="text-base shrink-0">
+            ${isDone ? '✅' : '🔒'}
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      document.getElementById('achievementsModal').classList.remove('hidden');
+    }
+
+    function closeAchievementsModal() {
+      document.getElementById('achievementsModal').classList.add('hidden');
+    }
+
+    /* =====================================================================
+       PROMO CODES
+       ===================================================================== */
+    function redeemPromoCode() {
+      const input = document.getElementById('promoCodeInput');
+      if (!input) return;
+
+      const raw = input.value.trim();
+      if (!raw) {
+        showToast('Введите промокод в поле!', '⚠️');
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9_-]+$/.test(raw)) {
+        showToast('Промокоды принимаются только на английском языке!', '❌');
+        return;
+      }
+
+      const cleanCode = raw.toLowerCase();
+      if (!state.redeemedCodes) state.redeemedCodes = [];
+
+      if (state.redeemedCodes.includes(cleanCode)) {
+        showToast('Вы уже вводили этот промокод!', '⚠️');
+        return;
+      }
+
+      const promo = PROMO_CODES[cleanCode];
+      if (!promo) {
+        showToast('Неверный промокод!', '❌');
+        return;
+      }
+
+      promo.apply();
+      state.redeemedCodes.push(cleanCode);
+      input.value = '';
+
+      playWinSfx();
+      showToast(`Промокод активирован! (${promo.rewardText})`, '🎁');
+
+      updateUI();
+      saveGame();
+    }
+
+    /* =====================================================================
+       STATS DASHBOARD (CACHED, UPDATED ONCE A MINUTE)
+       ===================================================================== */
+    let lastStatsUpdateTime = 0;
+    let cachedStatsHtml = '';
+
+    function updateStatsSnapshot(force = false) {
+      const now = Date.now();
+      if (!force && (now - lastStatsUpdateTime < 60000) && cachedStatsHtml) {
+        return;
+      }
+
+      lastStatsUpdateTime = now;
+      const ownedSkinsCount = Object.keys(state.inventory || {}).length;
+      const collectionPct = ((ownedSkinsCount / 42) * 100).toFixed(1);
+      const achCount = (state.unlockedAchievements || []).length;
+      const achPct = ((achCount / ACHIEVEMENTS.length) * 100).toFixed(1);
+
+      const d = new Date(now);
+      const timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+
+      cachedStatsHtml = `
+        <div class="grid grid-cols-2 gap-2">
+          <div class="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800">
+            <span class="text-[10px] text-slate-400 block uppercase font-semibold">Всего кликов</span>
+            <span class="text-sm font-mono font-bold text-amber-300">${formatNumber(state.totalClicks)}</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800">
+            <span class="text-[10px] text-slate-400 block uppercase font-semibold">Бананов за всё время</span>
+            <span class="text-sm font-mono font-bold text-amber-300">${formatNumber(state.allTimeBananas)} 🍌</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800">
+            <span class="text-[10px] text-slate-400 block uppercase font-semibold">Открыто кейсов</span>
+            <span class="text-sm font-mono font-bold text-purple-300">${state.casesOpened} шт.</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800">
+            <span class="text-[10px] text-slate-400 block uppercase font-semibold">Золотых Бананов</span>
+            <span class="text-sm font-mono font-bold text-yellow-300">${state.goldenClicks} шт.</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800">
+            <span class="text-[10px] text-slate-400 block uppercase font-semibold">Реинкарнаций</span>
+            <span class="text-sm font-mono font-bold text-emerald-300">${state.ascensions} раз</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800">
+            <span class="text-[10px] text-slate-400 block uppercase font-semibold">Золотых Кожурок</span>
+            <span class="text-sm font-mono font-bold text-amber-300">${(state.prestigePeels || 0) + (state.spentPeels || 0)} 🍌✨</span>
+          </div>
+        </div>
+
+        <div class="mt-2 p-3 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Собрано коллекции:</span>
+            <span class="font-mono font-bold text-slate-200">${ownedSkinsCount} / 42 (${collectionPct}%)</span>
+          </div>
+          <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+            <div class="h-full bg-gradient-to-r from-amber-500 to-yellow-400" style="width: ${collectionPct}%"></div>
+          </div>
+          <div class="flex justify-between items-center pt-1">
+            <span class="text-slate-400">Достижений закрыто:</span>
+            <span class="font-mono font-bold text-slate-200">${achCount} / ${ACHIEVEMENTS.length} (${achPct}%)</span>
+          </div>
+          <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+            <div class="h-full bg-gradient-to-r from-purple-500 to-pink-500" style="width: ${achPct}%"></div>
+          </div>
+        </div>
+      `;
+
+      const content = document.getElementById('statsModalContent');
+      if (content) content.innerHTML = cachedStatsHtml;
+
+      const updatedText = document.getElementById('statsLastUpdatedText');
+      if (updatedText) updatedText.innerText = `Обновлено: ${timeStr}`;
+    }
+
+    function openStatsModal() {
+      updateStatsSnapshot(false);
+      document.getElementById('statsModal').classList.remove('hidden');
+    }
+
+    function closeStatsModal() {
+      document.getElementById('statsModal').classList.add('hidden');
+    }
+
+    setInterval(() => updateStatsSnapshot(true), 60000);
+    setInterval(() => checkAchievements(), 3000);
+
+    /* =====================================================================
+       CASES & CS:GO ROULETTE
        ===================================================================== */
     function getCaseCost(c) {
       const discountLvl = state.secretUpgrades['upg_case_discount'] || 0;
@@ -1914,7 +2297,6 @@
 
       document.getElementById('rouletteCaseSubtitle').innerText = `${caseObj.name} • ${caseObj.desc}`;
 
-      // Pick winner taking into account Pity System
       state.pityEpic++;
       state.pityLegendary++;
 
@@ -1937,7 +2319,6 @@
         }
       }
 
-      // Filter pool by target rarity or fallback to pool
       let candidates = caseObj.pool
         .map(id => SKINS.find(s => s.id === id))
         .filter(s => s && s.rarity === targetRarity);
@@ -1949,19 +2330,16 @@
       const winnerSkin = candidates[Math.floor(Math.random() * candidates.length)] || SKINS[0];
       pendingWonSkin = winnerSkin;
 
-      // Build 45 roulette items. The winner is fixed at index 38
       const totalItems = 45;
       const winningIndex = 38;
       track.innerHTML = '';
 
-      const itemsList = [];
       for (let i = 0; i < totalItems; i++) {
         let s = winnerSkin;
         if (i !== winningIndex) {
           const randId = caseObj.pool[Math.floor(Math.random() * caseObj.pool.length)];
           s = SKINS.find(x => x.id === randId) || SKINS[0];
         }
-        itemsList.push(s);
 
         const card = document.createElement('div');
         card.className = `w-32 h-40 shrink-0 mx-1 rounded-xl bg-slate-900 border-2 ${getRarityBorderClass(s.rarity)} flex flex-col items-center justify-between p-2 shadow`;
@@ -1973,23 +2351,16 @@
         track.appendChild(card);
       }
 
-      // Calculate translation offset: each card is 128px + 8px margin = 136px
       const cardWidth = 136;
       const containerWidth = track.parentElement.offsetWidth || 650;
       const centerTarget = containerWidth / 2;
-      const randomJitter = (Math.random() - 0.5) * 70; // natural jitter inside winning card
+      const randomJitter = (Math.random() - 0.5) * 70;
       const targetOffset = (winningIndex * cardWidth) + (cardWidth / 2) - centerTarget + randomJitter;
 
-      // Reset transform
       track.style.transition = 'none';
       track.style.transform = 'translateX(0px)';
 
-      // Trigger audio clicks during animation
-      let lastTickTime = 0;
-      let tickInterval = null;
-
       setTimeout(() => {
-        // Spin duration: 5.2s with realistic easing
         track.style.transition = 'transform 5.2s cubic-bezier(0.12, 0.8, 0.2, 1)';
         track.style.transform = `translateX(-${targetOffset}px)`;
 
@@ -2000,7 +2371,6 @@
         function tickWatcher(now) {
           const progress = (now - startTimestamp) / 5200;
           if (progress < 1) {
-            // Frequency of ticks slows down smoothly
             const expectedTicks = Math.floor(Math.pow(progress, 0.45) * totalTicks);
             if (expectedTicks > ticksFired) {
               ticksFired++;
@@ -2012,15 +2382,12 @@
         requestAnimationFrame(tickWatcher);
       }, 50);
 
-      // On spin finished
       setTimeout(() => {
         isSpinning = false;
         playWinSfx();
 
-        // Add to player inventory
         state.inventory[winnerSkin.id] = (state.inventory[winnerSkin.id] || 0) + 1;
 
-        // Reveal winner card
         document.getElementById('rouletteWinSvg').innerHTML = renderBananaSvg(winnerSkin, '100%', '100%', 'win_reveal');
         document.getElementById('rouletteWinName').innerText = winnerSkin.name;
         document.getElementById('rouletteWinRarity').innerText = winnerSkin.rarity;
@@ -2060,21 +2427,23 @@
     }
 
     /* =====================================================================
-       INVENTORY UI, SELLING & DUPLICATE MANAGEMENT
+       INVENTORY UI & DUPLICATES
        ===================================================================== */
     function renderInventory() {
       const grid = document.getElementById('inventoryGrid');
       grid.innerHTML = '';
 
       const ownedSkinIds = Object.keys(state.inventory);
-      document.getElementById('headerSkinCount').innerText = `${ownedSkinIds.length}/42`;
-      document.getElementById('navInventoryCount').innerText = `${ownedSkinIds.length}/42`;
+      const skinCounterEl = document.getElementById('headerSkinCount');
+      if (skinCounterEl) skinCounterEl.innerText = `${ownedSkinIds.length}/42`;
+      
+      const navCountEl = document.getElementById('navInventoryCount');
+      if (navCountEl) navCountEl.innerText = `${ownedSkinIds.length}/42`;
 
       SKINS.forEach(skin => {
         const count = state.inventory[skin.id] || 0;
         const isEquipped = state.equippedSkinId === skin.id;
 
-        // Apply rarity filter
         if (currentFilter !== 'all' && skin.rarity !== currentFilter) {
           return;
         }
@@ -2082,7 +2451,6 @@
         const card = document.createElement('div');
         card.className = `glass-card glass-card-hover rounded-2xl p-3 flex flex-col items-center justify-between border-2 ${getRarityBorderClass(skin.rarity)} ${count === 0 ? 'opacity-40 grayscale' : ''} relative`;
 
-        // Card badges
         let badgeHtml = '';
         if (count > 1) {
           badgeHtml += `<span class="absolute top-2 left-2 text-[10px] bg-amber-500 text-slate-950 font-mono font-black px-1.5 py-0.5 rounded-lg shadow">x${count}</span>`;
@@ -2125,6 +2493,45 @@
       renderInventory();
       updateUI();
       saveGame();
+    }
+
+    function getSkinPowerScore(skin) {
+      const cpc = skin.cpcMult || 1.0;
+      const cps = skin.cpsMult || 1.0;
+      const crit = skin.critChance || 0.05;
+      return (cpc * cps) * (1 + crit * 2);
+    }
+
+    function equipBestSkin() {
+      const ownedIds = Object.keys(state.inventory || {}).filter(id => (state.inventory[id] || 0) > 0);
+      if (ownedIds.length === 0) return;
+
+      let bestSkin = null;
+      let bestScore = -1;
+
+      ownedIds.forEach(id => {
+        const skin = SKINS.find(s => s.id === id);
+        if (skin) {
+          const score = getSkinPowerScore(skin);
+          if (score > bestScore) {
+            bestScore = score;
+            bestSkin = skin;
+          }
+        }
+      });
+
+      if (bestSkin) {
+        if (state.equippedSkinId === bestSkin.id) {
+          showToast(`Уже надет лучший скин: ${bestSkin.name}!`, '⚡');
+          return;
+        }
+        applySkinToBanana(bestSkin.id);
+        playBuySfx();
+        showToast(`Экипирован скин: ${bestSkin.name}! (${bestSkin.rarity})`, '⚡');
+        renderInventory();
+        updateUI();
+        saveGame();
+      }
     }
 
     function sellDuplicate(skinId) {
@@ -2170,7 +2577,7 @@
       state.allTimeBananas += totalGained;
 
       playBuySfx();
-      showToast(`Продано ${duplicatesSold} дубликатов на сумму +${formatNumber(totalGained)} 🍌!`, '💰');
+      showToast(`Продано ${duplicatesSold} дубликатов (+${formatNumber(totalGained)} 🍌)!`, '💰');
       renderInventory();
       updateUI();
       saveGame();
@@ -2189,7 +2596,7 @@
     }
 
     /* =====================================================================
-       CASES STORE & PROBABILITIES INSPECT
+       CASES STORE
        ===================================================================== */
     function renderCasesStore() {
       const grid = document.getElementById('casesGrid');
@@ -2239,7 +2646,6 @@
       document.getElementById('caseInfoTitle').innerText = `${c.icon} ${c.name}`;
       document.getElementById('caseInfoDesc').innerText = `Стоимость открытия: ${formatNumber(c.cost)} бананов`;
 
-      // Rates
       const ratesBox = document.getElementById('caseInfoRates');
       ratesBox.innerHTML = '';
       Object.entries(c.rates).forEach(([rarity, pct]) => {
@@ -2251,7 +2657,6 @@
         }
       });
 
-      // Skins Pool
       const poolBox = document.getElementById('caseInfoContent');
       poolBox.innerHTML = '';
       c.pool.forEach(skinId => {
@@ -2281,7 +2686,7 @@
     }
 
     /* =====================================================================
-       BUILDINGS PURCHASING LOGIC
+       BUILDINGS LOGIC
        ===================================================================== */
     function getBuildingCost(b, count = 1) {
       let total = 0;
@@ -2367,7 +2772,6 @@
        PRESTIGE REINCARNATION (+20% BONUS PER PEEL)
        ===================================================================== */
     function calculatePendingPeels() {
-      // Scale based on all time bananas: 50,000 threshold
       const totalPeelsEarnedLifetime = (state.prestigePeels || 0) + (state.spentPeels || 0);
       const earned = Math.floor(Math.sqrt(state.allTimeBananas / 50000));
       return Math.max(0, earned - totalPeelsEarnedLifetime);
@@ -2382,7 +2786,9 @@
       document.getElementById('prestigePeelsCurrent').innerText = `${state.prestigePeels} шт. (+${totalEarnedPeels * 20 + overdriveBonus}%)`;
       document.getElementById('prestigePeelsPending').innerText = `+${pending} шт. (+${pending * 20}%)`;
       document.getElementById('prestigeAllTimeStat').innerText = formatNumber(state.allTimeBananas);
-      document.getElementById('topPrestigeMultiplier').innerText = `+${totalEarnedPeels * 20 + overdriveBonus}%`;
+      
+      const topPresMultiplier = document.getElementById('topPrestigeMultiplier');
+      if (topPresMultiplier) topPresMultiplier.innerText = `+${totalEarnedPeels * 20 + overdriveBonus}%`;
 
       const btn = document.getElementById('prestigeExecuteBtn');
       if (pending > 0) {
@@ -2424,7 +2830,7 @@
     }
 
     /* =====================================================================
-       SECRET MARKET ENGINE & PURCHASING
+       SECRET MARKET ENGINE
        ===================================================================== */
     function getSecretUpgradeCost(u) {
       const currentLevel = state.secretUpgrades[u.id] || 0;
@@ -2521,10 +2927,8 @@
       saveGame();
     }
 
-    // Passive Ghost Auto-Clicker
     setInterval(() => {
       if ((state.secretUpgrades['upg_auto_click'] || 0) > 0) {
-        // Automatically taps 5 times a second
         const cpc = calculateCpc();
         state.bananas += cpc * 0.5;
         state.allTimeBananas += cpc * 0.5;
@@ -2532,6 +2936,9 @@
       }
     }, 100);
 
+    /* =====================================================================
+       GOLDEN BANANA EVENT & OFFLINE EARNINGS
+       ===================================================================== */
     function scheduleGoldenBanana() {
       const luckLvl = state.secretUpgrades['upg_golden_luck'] || 0;
       const speedup = 1 / (1 + (luckLvl * 0.40));
@@ -2562,7 +2969,6 @@
 
       document.body.appendChild(el);
 
-      // Auto remove after 9 seconds if untouched
       setTimeout(() => {
         if (el.parentNode) {
           el.remove();
@@ -2603,7 +3009,6 @@
       const now = Date.now();
       const elapsedSec = Math.floor((now - state.lastSaveTime) / 1000);
 
-      // Smooth offline gain without blocking dialogs
       if (elapsedSec >= 15) {
         const cps = calculateCps();
         if (cps > 0) {
@@ -2612,7 +3017,7 @@
           if (earned > 0) {
             state.bananas += earned;
             state.allTimeBananas += earned;
-            showToast(`С возвращением! Оффлайн добыча: +${formatNumber(earned)} 🍌`, '💤');
+            showToast(`С возвращением! Оффлайн доход: +${formatNumber(earned)} 🍌`, '💤');
           }
         }
       }
@@ -2690,9 +3095,9 @@
       input.select();
       try {
         document.execCommand('copy');
-        showToast('Код сохранения скопирован в буфер обмена!', '💾');
+        showToast('Код сохранения скопирован в буфер!', '💾');
       } catch (e) {
-        prompt('Скопируйте ваш код сохранения вручную:', code);
+        prompt('Скопируйте код сохранения вручную:', code);
       }
       input.remove();
     }
@@ -2726,7 +3131,11 @@
           renderInventory();
           renderCasesStore();
           renderBuildings();
+          updateFreeDropBar();
           updatePrestigeInfo();
+          updateAchievementsBadge();
+          checkAchievements();
+          updateStatsSnapshot(true);
           updateUI();
           closeSaveInputModal();
           showToast('Сохранение успешно загружено!', '✅');
@@ -2788,15 +3197,14 @@
         if (t === tabId) {
           view.classList.remove('hidden');
           view.classList.add('flex');
-          btn.className = "flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-amber-400 text-amber-300 transition flex items-center justify-center gap-1.5 whitespace-nowrap";
+          btn.className = "flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-amber-400 text-amber-300 transition flex items-center justify-center gap-1.5 whitespace-nowrap";
         } else {
           view.classList.add('hidden');
           view.classList.remove('flex');
-          btn.className = "flex-1 py-2.5 px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap";
+          btn.className = "flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-center text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-1.5 whitespace-nowrap";
         }
       });
 
-      // Refresh content on tab switch
       if (tabId === 'inventory') renderInventory();
       if (tabId === 'cases') renderCasesStore();
       if (tabId === 'buildings') renderBuildings();
@@ -2807,8 +3215,8 @@
     function showToast(text, icon = '🍌') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
-      toast.className = "bg-slate-900 border border-slate-700 text-slate-100 text-xs font-bold px-3.5 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 animate-bounce-click pointer-events-auto border-l-4 border-l-amber-500";
-      toast.innerHTML = `<span class="text-base">${icon}</span> <span>${text}</span>`;
+      toast.className = "bg-slate-900 border border-slate-700 text-slate-100 text-xs font-bold px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-2xl shadow-xl flex items-center gap-2 animate-bounce-click pointer-events-auto border-l-4 border-l-amber-500 max-w-[90vw] truncate";
+      toast.innerHTML = `<span class="text-base">${icon}</span> <span class="truncate">${text}</span>`;
       container.appendChild(toast);
 
       setTimeout(() => {
@@ -2824,13 +3232,22 @@
        ===================================================================== */
     function updateUI() {
       document.getElementById('totalBananasText').innerText = formatNumber(state.bananas);
+      
+      const headerBananas = document.getElementById('headerBananasText');
+      if (headerBananas) headerBananas.innerText = formatNumber(state.bananas);
+
+      const headerCps = document.getElementById('headerCpsText');
+      if (headerCps) headerCps.innerText = formatNumber(calculateCps());
+
       document.getElementById('cpsText').innerText = formatNumber(calculateCps());
       document.getElementById('cpcText').innerText = formatNumber(calculateCpc());
 
       const skin = getEquippedSkin();
       document.getElementById('critChanceText').innerText = `${Math.round(skin.critChance * 100)}%`;
 
-      document.getElementById('headerPityEpic').innerText = `${state.pityEpic}/25`;
+      const headerPity = document.getElementById('headerPityEpic');
+      if (headerPity) headerPity.innerText = `${state.pityEpic}/25`;
+
       document.getElementById('pityEpicText').innerText = `${state.pityEpic} / 25`;
       document.getElementById('pityLegendaryText').innerText = `${state.pityLegendary} / 75`;
 
@@ -2874,6 +3291,8 @@
         updateFreeDropBar();
         updatePrestigeInfo();
         renderSecretShop();
+        updateAchievementsBadge();
+        updateStatsSnapshot(true);
         updateUI();
         scheduleGoldenBanana();
         checkOfflineEarnings();
